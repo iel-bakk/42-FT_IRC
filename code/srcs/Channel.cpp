@@ -22,11 +22,14 @@ int Channel:: parse_channel(std:: string channel)
     std::string pass;
 
     tab = channel.substr(channel.find(' ') + 1);
-    if (tab[0] == '#') {
+    if (tab[0] == '#' || tab[0] == '&') {
         if (tab.find(' ') != std::string::npos && tab.find(' ') + 1 < tab.length()) {
             pass = tab.substr(tab.find(' ') + 1);
+            tab = tab.substr(1, tab.find(' ') - 1);
         }
-        std::cout << "name : " << tab << std::endl;
+        else
+            tab = tab.substr(1, tab.find('\r') - 1);
+        std::cout << "name : " << tab << "." << std::endl;
         std::cout << "pass : " << pass << std::endl;
         return (0);
     }
