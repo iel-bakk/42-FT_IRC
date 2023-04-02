@@ -19,19 +19,15 @@ std::string Channel::get_channel_password() {
 int Channel:: parse_channel(std:: string channel)
 {
     std:: string tab;
+    std::string pass;
 
     tab = channel.substr(channel.find(' ') + 1);
-    if (tab.find(' ') != std:: string:: npos)
-    {
-        if (tab.find('&'))
-            return 461;
-        this->name = tab.substr(1, tab.find(' '));
-        this->password = tab.substr(tab.find(' ') + 1);
-        return (0);
-    }
-    else if (!tab.find('#'))
-    {
-        this->name = tab.substr(1);
+    if (tab[0] == '#') {
+        if (tab.find(' ') != std::string::npos && tab.find(' ') + 1 < tab.length()) {
+            pass = tab.substr(tab.find(' ') + 1);
+        }
+        std::cout << "name : " << tab << std::endl;
+        std::cout << "pass : " << pass << std::endl;
         return (0);
     }
     return (461);

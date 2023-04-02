@@ -358,3 +358,7 @@ std:: vector<std:: string> Message:: create_vector(void)
 {
     return std:: vector<std:: string>();
 }
+
+void    Message::add_new_channel() {
+    channels.insert(std::pair<std::string, Channel>(this->channel.get_channel_name(), this->channel));
+}
