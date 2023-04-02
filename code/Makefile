@@ -1,5 +1,5 @@
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++11
+CFLAGS = -Wall -Wextra -Werror -std=c++98
 NAME = ircserv
 
 SRC = srcs/Client.cpp srcs/Channel.cpp srcs/Message.cpp srcs/Server.cpp main.cpp

@@ -1,3 +1,6 @@
+#ifndef SERVER_HPP
+# define SERVER_HPP
+
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -6,9 +9,12 @@
 #include <sys/poll.h>
 #include <stdlib.h>
 #include <map>
+#include "../Classes/Channel.hpp"
 #include "../Classes/Message.hpp"
 
 # define max_num_fds 10
+
+class Message;
 
 class Server
 {
@@ -27,6 +33,8 @@ class Server
         std:: map<int, Message> file_vectors;
         std:: string _buffer;
         std:: string old_buffer;
+        std::map<std::string, Channel> channels;
+
     public:
         Server();
         Server(int port, std:: string password);
@@ -53,4 +61,7 @@ class Server
         int display_error(void);
         int send_private_message(void);
         bool check_ctrl_D(std:: string buffer);
+        void    add_new_channel(Channel& new_channel);
 };
+
+#endif

@@ -80,7 +80,7 @@ void Message:: set_message(std:: string message)
     this->message = message;
 }
 
-int Message:: parse_message(std:: string password, std:: string message)
+int Message:: parse_message(std:: string password, std:: string message, Server& server)
 {
     int check = 0;
 
@@ -127,16 +127,20 @@ int Message:: parse_message(std:: string password, std:: string message)
             break ;
         }
     }
-    check = check_my_vector(this->params.back());
+    check = check_my_vector(this->params.back(), server);
     if (check != 0 && check != 13 && check != 14)
         this->params.erase(this->params.end() - 1);
     return (check);
 }
 
-int Message:: check_my_vector(std:: string request)
+int Message:: check_my_vector(std:: string request, Server& server)
 {
    int check;
     check = 0;
+    std::map<std::string, Channel>::iterator it;
+    for (it = this->channels.begin(); it != this->channels.end(); it++) {
+        std::cout << "name : " << it->second.get_channel_name() << ", pass : " << it->second.get_channel_password() << std::endl;
+    }
     if (this->command == "NICK")
     {
         if (this->message.empty())
@@ -153,9 +157,8 @@ int Message:: check_my_vector(std:: string request)
     {   
         check = channel.parse_channel(request, this->channel);
         if (check == 0){
-            add_new_channel();
-            std::cout << this->channels[this->channel.get_channel_name()].get_channel_name() << std::endl;
-            std::cout << this->channels[this->channel.get_channel_name()].get_channel_password() << std::endl;
+            server.add_new_channel(this->channel);
+            std::cout << this->client.get_nick_name() << std::endl;
         }
     }
     else if (this->command == "PRIVMSG")
