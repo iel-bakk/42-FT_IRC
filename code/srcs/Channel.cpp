@@ -38,3 +38,15 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
     }
     return (461);
 }
+
+void    Channel::add_user_to_list(std::string user_nick) {
+    this->users_list.push_back(user_nick);
+}
+
+void    Channel::print_users_list() {
+    std::vector <std::string>::iterator it;
+
+    for (it = this->users_list.begin(); it != this->users_list.end(); it++) {
+        std::cout << *it << std::endl;
+    }
+}

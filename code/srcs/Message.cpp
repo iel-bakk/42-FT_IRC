@@ -137,10 +137,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
 {
    int check;
     check = 0;
-    std::map<std::string, Channel>::iterator it;
-    for (it = this->channels.begin(); it != this->channels.end(); it++) {
-        std::cout << "name : " << it->second.get_channel_name() << ", pass : " << it->second.get_channel_password() << std::endl;
-    }
+
     if (this->command == "NICK")
     {
         if (this->message.empty())
@@ -157,8 +154,13 @@ int Message:: check_my_vector(std:: string request, Server& server)
     {   
         check = channel.parse_channel(request, this->channel);
         if (check == 0){
-            server.add_new_channel(this->channel);
-            std::cout << this->client.get_nick_name() << std::endl;
+            if (!server.channel_exists(this->channel)) {
+                server.add_new_channel(this->channel);
+                server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
+            }
+            else {
+                server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
+            }
         }
     }
     else if (this->command == "PRIVMSG")

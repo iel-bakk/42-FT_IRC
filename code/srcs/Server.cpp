@@ -89,11 +89,6 @@ void Server:: accept_socket(void)
     count = 0;
     while (true)
     {
-        std::map<std::string, Channel>::iterator it;
-    
-        for (it = this->channels.begin(); it != this->channels.end(); it++) {
-            std::cout << "name : " << it->first << " pass : " << it->second.get_channel_password() << std::endl;
-        }
         int ret = poll(this->fds, num_fds, -1);
         if (ret < 0)
         {
@@ -159,6 +154,12 @@ void Server:: read_write_socket(int sockfd, int *num_fds, Message *new_user)
         return ;
     }
     tab = buffer;
+    std::map<std::string, Channel>::iterator it;
+
+    for (it = this->channels.begin(); it != this->channels.end(); it++) {
+        std::cout << "channel : " << it->first << std::endl;
+        it->second.print_users_list();
+    }
     if (check_ctrl_D(tab))
         check = new_user->parse_message(this->password, this->_buffer, *this);
     n = HandleError(check, sockfd);
@@ -321,4 +322,14 @@ bool Server:: check_ctrl_D(std:: string buffer)
 
 void    Server::add_new_channel(Channel& new_channel) {
     this->channels.insert(std::pair<std::string, Channel>(new_channel.get_channel_name(), new_channel));
+}
+
+bool    Server::channel_exists(Channel& channel) {
+    if (this->channels.find(channel.get_channel_name()) != this->channels.end())
+        return (true);
+    return (false);
+}
+
+void    Server::add_user_to_channel(std::string user, std::string channel) {
+    this->channels[channel].add_user_to_list(user);
 }
