@@ -151,7 +151,12 @@ int Message:: check_my_vector(std:: string request)
         check = client.parse_username(request);
     else if (this->command == "JOIN")
     {   
-        check = channel.parse_channel(request);
+        check = channel.parse_channel(request, this->channel);
+        if (check == 0){
+            add_new_channel();
+            std::cout << this->channels[this->channel.get_channel_name()].get_channel_name() << std::endl;
+            std::cout << this->channels[this->channel.get_channel_name()].get_channel_password() << std::endl;
+        }
     }
     else if (this->command == "PRIVMSG")
     {
@@ -357,4 +362,8 @@ bool Message:: check_command(std:: string command)
 std:: vector<std:: string> Message:: create_vector(void)
 {
     return std:: vector<std:: string>();
+}
+
+void    Message::add_new_channel() {
+    channels.insert(std::pair<std::string, Channel>(this->channel.get_channel_name(), this->channel));
 }

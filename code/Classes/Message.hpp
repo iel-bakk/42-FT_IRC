@@ -5,6 +5,7 @@
 #include <vector>
 #include "../Classes/Client.hpp"
 #include "../Classes/Channel.hpp"
+# include <map>
 
 class Message
 {
@@ -25,6 +26,8 @@ private:
     std:: vector<std:: string> params;
     Client client;
     Channel channel;
+    std::map<std::string, Channel> channels;
+
 public:
     Message();
     Message(int socket);
@@ -54,6 +57,7 @@ public:
     std:: vector<std:: string> create_vector(void);
     bool check_command(std:: string command);
     int check_message(std:: string message);
+    void add_new_channel();
 };
 
 #endif
