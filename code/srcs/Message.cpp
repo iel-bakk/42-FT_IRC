@@ -151,7 +151,12 @@ int Message:: check_my_vector(std:: string request)
         check = client.parse_username(request);
     else if (this->command == "JOIN")
     {   
-        check = channel.parse_channel(request);
+        check = channel.parse_channel(request, this->channel);
+        if (check == 0){
+            add_new_channel();
+            std::cout << this->channels[this->channel.get_channel_name()].get_channel_name() << std::endl;
+            std::cout << this->channels[this->channel.get_channel_name()].get_channel_password() << std::endl;
+        }
     }
     else if (this->command == "PRIVMSG")
     {

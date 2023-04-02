@@ -16,7 +16,7 @@ std::string Channel::get_channel_password() {
     return (this->password);
 }
 
-int Channel:: parse_channel(std:: string channel)
+int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
 {
     std:: string tab;
     std::string pass;
@@ -26,12 +26,15 @@ int Channel:: parse_channel(std:: string channel)
         if (tab.find(' ') != std::string::npos && tab.find(' ') + 1 < tab.length()) {
             pass = tab.substr(tab.find(' ') + 1);
             tab = tab.substr(1, tab.find(' ') - 1);
+            msg_channel.name = tab;
+            msg_channel.password = pass;
+            return (0);
         }
-        else
+        else {
             tab = tab.substr(1, tab.find('\r') - 1);
-        std::cout << "name : " << tab << "." << std::endl;
-        std::cout << "pass : " << pass << std::endl;
-        return (0);
+            msg_channel.name = tab;
+            return (0);
+        }
     }
     return (461);
 }

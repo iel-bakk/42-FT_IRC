@@ -11,7 +11,7 @@ private:
 public:
     Channel();
     ~Channel();
-    int parse_channel(std:: string channel);
+    int parse_channel(std:: string channel, Channel& msg_channel);
     std::string get_channel_name();
     std::string get_channel_password();
 };
