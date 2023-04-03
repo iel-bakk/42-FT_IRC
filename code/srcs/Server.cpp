@@ -348,6 +348,19 @@ void    Server::send_channel_users_list(std::string channel_name, Message& clien
     }
 }
 
-void    Server::send_message_to_channel(std::string channel_name) {
-    
+void    Server::send_message_to_channel(std::string channel_name,std::string message, std::string client) {
+    std::map<int, Message> ::iterator it;
+    std::vector<std::string> list;
+    std::string msg;
+
+    list = this->channels[channel_name].get_users_list();
+    msg = client + " :" + message + "\n";
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
+    {
+        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end())
+
+           if( send (it->second.get_socket(),msg.c_str(),msg.size(),0) < 0)
+                std::cout << "Error:  micaje not sind" << std::endl;
+            
+    }
 }
