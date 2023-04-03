@@ -358,9 +358,7 @@ void    Server::send_message_to_channel(std::string channel_name,std::string mes
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
     {
         if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end())
-
            if( send (it->second.get_socket(),msg.c_str(),msg.size(),0) < 0)
                 std::cout << "Error:  micaje not sind" << std::endl;
-            
     }
 }
