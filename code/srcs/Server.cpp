@@ -324,12 +324,26 @@ void    Server::add_new_channel(Channel& new_channel) {
     this->channels.insert(std::pair<std::string, Channel>(new_channel.get_channel_name(), new_channel));
 }
 
-bool    Server::channel_exists(Channel& channel) {
-    if (this->channels.find(channel.get_channel_name()) != this->channels.end())
+bool    Server::channel_exists(std::string channel) {
+    if (this->channels.find(channel) != this->channels.end())
         return (true);
     return (false);
 }
 
 void    Server::add_user_to_channel(std::string user, std::string channel) {
     this->channels[channel].add_user_to_list(user);
+}
+
+void    Server::send_channel_users_list(std::string channel_name, Message& client) {
+    std::map <int, Message>::iterator it;
+    std::vector<std::string> list;
+
+    list = this->channels[channel_name].get_users_list();
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
+        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end()){
+            std::string msg = it->second.get_client().get_nick_name() + '\n';
+            if (send(client.get_socket(), msg.c_str(), msg.size(), 0) < 0)
+                std::cout << "error : couldn't send message." << std::endl;
+        }
+    }
 }

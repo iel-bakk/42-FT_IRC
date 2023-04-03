@@ -50,3 +50,7 @@ void    Channel::print_users_list() {
         std::cout << *it << std::endl;
     }
 }
+
+std::vector<std::string> Channel::get_users_list() {
+    return (this->users_list);
+}

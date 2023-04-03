@@ -61,6 +61,8 @@ public:
     bool check_command(std:: string command);
     int check_message(std:: string message);
     void add_new_channel();
+    int parse_channel_message(std::string request, Server& server);
+    Client  get_client();
 };
 
 #endif

@@ -154,18 +154,25 @@ int Message:: check_my_vector(std:: string request, Server& server)
     {   
         check = channel.parse_channel(request, this->channel);
         if (check == 0){
-            if (!server.channel_exists(this->channel)) {
+            if (!server.channel_exists(this->channel.get_channel_name())) {
                 server.add_new_channel(this->channel);
                 server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
+                server.send_channel_users_list(this->channel.get_channel_name(), *this);
             }
             else {
                 server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
+                server.send_channel_users_list(this->channel.get_channel_name(), *this);
             }
         }
     }
     else if (this->command == "PRIVMSG")
     {
-        if (client.get_nick_name().size() != 0 && client.get_user_name().size() != 0)
+        if (request[request.find(' ') + 1] == '#')
+        {
+            std::cout << "channel message." << std::endl;
+            check = parse_channel_message(request, server);
+        }
+        else if (client.get_nick_name().size() != 0 && client.get_user_name().size() != 0)
         {
             check = parse_private_message(request);
             this->notice_private = " PRIVMSG ";
@@ -371,4 +378,30 @@ std:: vector<std:: string> Message:: create_vector(void)
 
 void    Message::add_new_channel() {
     channels.insert(std::pair<std::string, Channel>(this->channel.get_channel_name(), this->channel));
+}
+
+int Message::parse_channel_message(std::string request, Server& server) {
+    std::string channel_name;
+    std::string message;
+
+    channel_name = request.substr(request.find(' ') + 1);
+    if (channel_name.find(':') + 1 != std::string::npos) {
+        message = channel_name.substr(channel_name.find(':') + 1);
+        channel_name = channel_name.substr(1, channel_name.find(' ') - 1);
+    }
+    else
+        channel_name = channel_name.substr(1, channel_name.find('\r'));
+    if (server.channel_exists(channel_name) == true)
+    {
+        message = this->client.get_nick_name() + " : " + message;
+        if (send(this->socket, message.c_str(), message.size(), 0) < 0)
+        {
+            std::cout << "error : couldn't send message." << std::endl;
+        }
+    }
+    return (0);
+}
+
+Client  Message::get_client() {
+    return (this->client);
 }

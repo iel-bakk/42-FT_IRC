@@ -62,8 +62,9 @@ class Server
         int send_private_message(void);
         bool check_ctrl_D(std:: string buffer);
         void    add_new_channel(Channel& new_channel);
-        bool    channel_exists(Channel& channel);
+        bool    channel_exists(std::string channel);
         void    add_user_to_channel(std::string user, std::string channel);
+        void    send_channel_users_list(std::string channel_name, Message& client);
 };
 
 #endif
