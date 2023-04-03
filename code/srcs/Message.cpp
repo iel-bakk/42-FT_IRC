@@ -393,11 +393,12 @@ int Message::parse_channel_message(std::string request, Server& server) {
         channel_name = channel_name.substr(1, channel_name.find('\r'));
     if (server.channel_exists(channel_name) == true)
     {
-        message = this->client.get_nick_name() + " : " + message;
-        if (send(this->socket, message.c_str(), message.size(), 0) < 0)
-        {
-            std::cout << "error : couldn't send message." << std::endl;
-        }
+        server.send_message_to_channel(channel_name);
+        // message = this->client.get_nick_name() + " : " + message;
+        // if (send(this->socket, message.c_str(), message.size(), 0) < 0)
+        // {
+        //     std::cout << "error : couldn't send message." << std::endl;
+        // }
     }
     return (0);
 }

@@ -347,3 +347,7 @@ void    Server::send_channel_users_list(std::string channel_name, Message& clien
         }
     }
 }
+
+void    Server::send_message_to_channel(std::string channel_name) {
+    
+}
