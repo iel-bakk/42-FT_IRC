@@ -26,14 +26,14 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
     std::string mode;
 
     tab = channel.substr(channel.find(' ') + 1);
-    std::cout << tab << std::endl;
-    if ((tab[0] == '#' || tab[0] == '&' ) && tab.length() > 1 && tab[1] == ' '){
+    if ((tab[0] == '#' || tab[0] == '&' ) && tab.length() > 1 && tab[1] != ' '){
         if (tab.find(' ') != std::string::npos && tab.find(' ') + 1 < tab.length()) {
+            std::cout << tab << std::endl;
             if (tab.find('+') != std::string::npos && tab.find('+') + 1 < tab.length())
             {
+
                 mode = tab.substr(tab.find('+'));
-                std::cout <<"MODE :" << mode << std::endl;
-                if (mode.find(' ') + 1 < mode.length())
+                if (mode.find(' ') + 1 < mode.length() && mode[1] != ' ')
                 {
                     pass = mode.substr(mode.find(' ') + 1);
                     std::cout <<"pass :" << pass << std::endl;
@@ -47,6 +47,8 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
                     return (0);
 
                 }
+                else 
+                    return (461);
             }
             else{
                 pass = tab.substr(tab.find(' ') + 1);
