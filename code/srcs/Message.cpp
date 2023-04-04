@@ -84,7 +84,7 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
 {
     int check = 0;
 
-    // std::cout << "message : " << message << std::endl << "pass : " << std::endl;
+    std::cout << message << std::endl;
     this->message = message;
     if (this->message[0] == ':')
     {
@@ -158,12 +158,12 @@ int Message:: check_my_vector(std:: string request, Server& server)
                 server.add_new_channel(this->channel);
                 server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
                 server.send_channel_users_list(this->channel.get_channel_name(), *this);
-                server.send_message_to_channel(this->channel.get_channel_name(), "joined.", this->client.get_nick_name());
+                server.send_join_message(this->client.get_nick_name(), this->channel.get_channel_name());
             }
             else {
                 server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
                 server.send_channel_users_list(this->channel.get_channel_name(), *this);
-                server.send_message_to_channel(this->channel.get_channel_name(), "joined.", this->client.get_nick_name());
+                server.send_join_message(this->client.get_nick_name(), this->channel.get_channel_name());
             }
         }
     }
@@ -281,7 +281,8 @@ int Message:: send_Message_identification(int check)
     gethostname(hostname, sizeof(hostname));
     if (client.get_nick_name().size() != 0 && client.get_user_name().size() != 0 && this->enter == false)
     {
-        this->welcome_message = ": 001 " + client.get_nick_name() + " Welcome to Internet Chat Relay";
+        this->hostname = std::string(hostname);
+        this->welcome_message = ":irc.1337.ma 001 " + client.get_nick_name() + " : Welcome to Internet Chat Relay";
         this->host_message = ": 002 " + client.get_nick_name() + " Your Host is " + std:: string(hostname) + ", running version 1.0";
         this->server_message = ": 003 " + client.get_nick_name() + " Ther server was created on " + std:: string(time_str);
         this->enter = true;
@@ -389,6 +390,7 @@ int Message::parse_channel_message(std::string request, Server& server) {
     channel_name = request.substr(request.find(' ') + 1);
     if (channel_name.find(':') + 1 != std::string::npos) {
         message = channel_name.substr(channel_name.find(':') + 1);
+        message = message.substr(message.find(' '));
         channel_name = channel_name.substr(1, channel_name.find(' ') - 1);
     }
     else

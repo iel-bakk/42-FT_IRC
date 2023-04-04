@@ -15,6 +15,7 @@ class Message
 private:
     int socket;
     bool enter;
+    std::string hostname;
     std:: string message;
     std:: string welcome_message;
     std:: string host_message;

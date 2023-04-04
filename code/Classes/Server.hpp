@@ -66,6 +66,9 @@ class Server
         void    add_user_to_channel(std::string user, std::string channel);
         void    send_channel_users_list(std::string channel_name, Message& client);
         void    send_message_to_channel(std::string channel_name, std::string message, std::string client);
+        void    send_join_message(std::string username, std::string channel_name);
+        void    send_a_message(int socket, std::string message);
+        void    send_mode_message(std::string channel_name, std::string channel_mode, int socket);
 };
 
 #endif
