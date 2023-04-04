@@ -335,11 +335,11 @@ void    Server::send_channel_users_list(std::string channel_name, Message& clien
     std::string end_list_msg;
     std::string join_msg;
 
-    join_msg = ": JOIN :#" + channel_name + "\r\n";
-    end_list_msg = ": 366 " + client.get_client().get_nick_name() + " = #" + channel_name + " :End of /NAMES list." + "\r\n";
-    list_msg = ": 353 " + client.get_client().get_nick_name() + " = #" + channel_name + " :";
+    join_msg = ": JOIN " + channel_name + "\r\n";
+    end_list_msg = ": 366 " + client.get_client().get_nick_name() + " = " + channel_name + " :End of /NAMES list." + "\r\n";
+    list_msg = ":irc_server 353 " + client.get_client().get_nick_name() + " = " + channel_name + " :";
     list = this->channels[channel_name].get_users_list();
-    this->send_a_message(client.get_socket(), join_msg);
+    // this->send_a_message(client.get_socket(), join_msg);
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
         if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end()){
             list_msg += it->second.get_client().get_nick_name() + " ";
@@ -378,7 +378,7 @@ void    Server::send_join_message(std::string username, std::string channel_name
     std::cout << msg ;
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
     {
-        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end() && it->second.get_client().get_nick_name() != username) {
+        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end()) {
 
            if( send (it->second.get_socket(),msg.c_str(),msg.size(),0) < 0)
                 std::cout << "Error:  micaje not sind" << std::endl;
