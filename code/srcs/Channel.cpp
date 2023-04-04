@@ -15,20 +15,46 @@ std::string Channel::get_channel_name() {
 std::string Channel::get_channel_password() {
     return (this->password);
 }
+std::string Channel::get_mode() {
+    return (this->mode);
+}
 
 int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
 {
     std:: string tab;
     std::string pass;
+    std::string mode;
 
     tab = channel.substr(channel.find(' ') + 1);
-    if (tab[0] == '#' || tab[0] == '&') {
+    std::cout << tab << std::endl;
+    if ((tab[0] == '#' || tab[0] == '&' ) && tab.length() > 1 && tab[1] == ' '){
         if (tab.find(' ') != std::string::npos && tab.find(' ') + 1 < tab.length()) {
-            pass = tab.substr(tab.find(' ') + 1);
-            tab = tab.substr(1, tab.find(' ') - 1);
+            if (tab.find('+') != std::string::npos && tab.find('+') + 1 < tab.length())
+            {
+                mode = tab.substr(tab.find('+'));
+                std::cout <<"MODE :" << mode << std::endl;
+                if (mode.find(' ') + 1 < mode.length())
+                {
+                    pass = mode.substr(mode.find(' ') + 1);
+                    std::cout <<"pass :" << pass << std::endl;
+                    mode = mode.substr(0,mode.find(' '));
+                    std::cout <<"MODE :" << mode << std::endl;
+                    tab = tab.substr(1, tab.find(' ') - 1);
+                    std::cout <<"TAB :" << tab << std::endl;
+                    msg_channel.name = tab;
+                    msg_channel.password = pass;
+                    msg_channel.mode = mode;
+                    return (0);
+
+                }
+            }
+            else{
+                pass = tab.substr(tab.find(' ') + 1);
+                tab = tab.substr(1, tab.find(' ') - 1);
             msg_channel.name = tab;
             msg_channel.password = pass;
             return (0);
+            }
         }
         else {
             tab = tab.substr(1, tab.find('\r') - 1);
