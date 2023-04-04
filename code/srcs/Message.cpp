@@ -390,7 +390,6 @@ int Message::parse_channel_message(std::string request, Server& server) {
     channel_name = request.substr(request.find(' ') + 1);
     if (channel_name.find(':') + 1 != std::string::npos) {
         message = channel_name.substr(channel_name.find(':') + 1);
-        message = message.substr(message.find(' '));
         channel_name = channel_name.substr(1, channel_name.find(' ') - 1);
     }
     else
