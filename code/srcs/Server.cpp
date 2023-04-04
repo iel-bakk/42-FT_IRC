@@ -337,7 +337,7 @@ void    Server::send_channel_users_list(std::string channel_name, Message& clien
 
     join_msg = ": JOIN " + channel_name + "\r\n";
     end_list_msg = ": 366 " + client.get_client().get_nick_name() + " = " + channel_name + " :End of /NAMES list." + "\r\n";
-    list_msg = ":irc_server 353 " + client.get_client().get_nick_name() + " = " + channel_name + " :";
+    list_msg = ":irc_server 353 " + client.get_client().get_nick_name() + " = #" + channel_name + " :";
     list = this->channels[channel_name].get_users_list();
     // this->send_a_message(client.get_socket(), join_msg);
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
