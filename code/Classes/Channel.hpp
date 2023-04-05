@@ -20,6 +20,7 @@ public:
     void    add_user_to_list(std::string user_nick);
     void    print_users_list();
     std::vector <std::string> get_users_list();
+    void    empty_channel();
 };
 
 #endif

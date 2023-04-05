@@ -161,10 +161,16 @@ int Message:: check_my_vector(std:: string request, Server& server)
                 server.send_channel_users_list(this->channel.get_channel_name(), *this);
             }
             else {
-                server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
-                server.send_join_message(this->client.get_nick_name(), this->channel.get_channel_name());
-                server.send_channel_users_list(this->channel.get_channel_name(), *this);
+                if (this->channel.get_channel_password() == server.get_channel_password(this->channel.get_channel_name())) {
+                    server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
+                    server.send_join_message(this->client.get_nick_name(), this->channel.get_channel_name());
+                    server.send_channel_users_list(this->channel.get_channel_name(), *this);
+                }
+                else {
+                    check = 464;
+                }
             }
+            this->channel.empty_channel();
         }
     }
     else if (this->command == "PRIVMSG")
@@ -397,11 +403,6 @@ int Message::parse_channel_message(std::string request, Server& server) {
     if (server.channel_exists(channel_name) == true)
     {
         server.send_message_to_channel(channel_name, message,this->client.get_nick_name());
-        // message = this->client.get_nick_name() + " : " + message;
-        // if (send(this->socket, message.c_str(), message.size(), 0) < 0)
-        // {
-        //     std::cout << "error : couldn't send message." << std::endl;
-        // }
     }
     return (0);
 }

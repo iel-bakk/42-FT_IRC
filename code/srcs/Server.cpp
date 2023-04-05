@@ -398,3 +398,7 @@ void    Server::send_mode_message(std::string channel_name, std::string mode, in
     send_a_message(socket, msg);
 }
 
+
+std::string Server::get_channel_password(std::string channel_name) {
+    return (this->channels[channel_name].get_channel_password());
+}

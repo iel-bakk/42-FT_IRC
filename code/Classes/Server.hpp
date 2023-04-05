@@ -69,6 +69,7 @@ class Server
         void    send_join_message(std::string username, std::string channel_name);
         void    send_a_message(int socket, std::string message);
         void    send_mode_message(std::string channel_name, std::string channel_mode, int socket);
+        std::string get_channel_password(std::string channel_name);
 };
 
 #endif

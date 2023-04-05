@@ -54,3 +54,8 @@ void    Channel::print_users_list() {
 std::vector<std::string> Channel::get_users_list() {
     return (this->users_list);
 }
+
+void    Channel::empty_channel() {
+    this->name = "";
+    this->password = "";
+}
