@@ -155,6 +155,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
         check = channel.parse_channel(request, this->channel);
         if (check == 0){
             if (!server.channel_exists(this->channel.get_channel_name())) {
+                this->channel.add_admin(this->client.get_nick_name());
                 server.add_new_channel(this->channel);
                 server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
                 server.send_join_message(this->client.get_nick_name(), this->channel.get_channel_name());

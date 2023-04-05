@@ -59,3 +59,7 @@ void    Channel::empty_channel() {
     this->name = "";
     this->password = "";
 }
+
+void    Channel::add_admin(std::string user_nick){
+    this->admins.push_back(user_nick);
+}

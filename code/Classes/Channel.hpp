@@ -8,6 +8,7 @@ class Channel
 {
 private:
     std:: string name;
+    std::vector <std::string> admins;
     std:: string password;
     std::vector <std::string>   users_list;
 
@@ -21,6 +22,7 @@ public:
     void    print_users_list();
     std::vector <std::string> get_users_list();
     void    empty_channel();
+    void    add_admin(std::string user_nick);
 };
 
 #endif
