@@ -23,6 +23,7 @@ public:
     std::vector <std::string> get_users_list();
     void    empty_channel();
     void    add_admin(std::string user_nick);
+    void    remove_user_from_channel_list(std::string username);
 };
 
 #endif

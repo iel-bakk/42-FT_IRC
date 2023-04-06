@@ -63,3 +63,13 @@ void    Channel::empty_channel() {
 void    Channel::add_admin(std::string user_nick){
     this->admins.push_back(user_nick);
 }
+
+void Channel::remove_user_from_channel_list(std::string username) {
+    if (this->users_list.empty()) {
+        return;
+    }
+    std::vector<std::string>::iterator it = std::find(this->users_list.begin(), this->users_list.end(), username);
+    if (it != this->users_list.end()) {
+        this->users_list.erase(it);
+    }
+}

@@ -199,6 +199,14 @@ int Message:: check_my_vector(std:: string request, Server& server)
         else
             check = 451;
     }
+    else if (this->command == "PART")
+    {
+        check = parse_part_command(request, server);
+        return (check);
+    }
+    else if (this->command == "MODE") {
+        //add mode code.
+    }
    check = send_Message_identification(check);
    return (check);
 }
@@ -256,7 +264,9 @@ int Message:: check_Error_Space(std:: string command)
     int check;
    
     check = 0;
-    if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos || command.find("JOIN") != std:: string:: npos)
+    if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos
+        || command.find("JOIN") != std:: string:: npos || command.find("PART") != std:: string:: npos
+        || command.find("MODE") != std:: string:: npos)
         return check = 461;
     else if (command.find("NICK") != std:: string:: npos)
         return check = 431;
@@ -268,7 +278,7 @@ int Message:: check_message(std:: string command)
     int check;
    
     check = 0;
-    if (command.find("USER") != std:: string:: npos || command.find("NICK") != std:: string:: npos || command.find("NICK") != std:: string:: npos)
+    if (command.find("USER") != std:: string:: npos || command.find("NICK") != std:: string:: npos || command.find("PASS") != std:: string:: npos)
     {
         if (this->command == "NICK")
             return check = 432;
@@ -376,7 +386,7 @@ bool Message:: check_command(std:: string command)
 {
      if (command.find("PASS") != std:: string :: npos || command.find("NICK") != std:: string :: npos \
     || command.find("USER") != std:: string :: npos || command.find("PRIVMSG") != std:: string :: npos || command.find("NOTICE") != std:: string :: npos \
-    || command.find("JOIN") != std:: string :: npos)
+    || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos || command.find("MODE") != std:: string :: npos)
         return false;
     return true;
 }
@@ -410,4 +420,27 @@ int Message::parse_channel_message(std::string request, Server& server) {
 
 Client  Message::get_client() {
     return (this->client);
+}
+
+int Message::parse_part_command(std::string request, Server& server) {
+    std::string channel_name;
+    std::string message;
+
+    channel_name = request.substr(request.find(' ') + 1);
+    if (channel_name.find(':') != std::string::npos) {
+        std::cout << "here" << std::endl;
+        message = channel_name.substr(channel_name.find(':') + 1);
+        channel_name = channel_name.substr(1, channel_name.find(' ') - 1);
+    }
+    else {
+        std::cout << "not here" << std::endl;
+        channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find('\r'));
+        std::cout << channel_name << "." << std::endl;
+    }
+    if (server.user_exist_in_channel(this->client.get_nick_name(), channel_name)) {
+        server.remove_user_from_channel(this->client.get_nick_name(), channel_name);
+    }
+    else
+        std::cout << "NO" <<std::endl;
+    return (0);
 }

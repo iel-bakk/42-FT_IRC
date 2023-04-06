@@ -319,7 +319,7 @@ void    Server::add_new_channel(Channel& new_channel) {
 }
 
 bool    Server::channel_exists(std::string channel) {
-    if (this->channels.find(channel) != this->channels.end())
+    if (this->channels.count(channel))
         return (true);
     return (false);
 }
@@ -398,7 +398,23 @@ void    Server::send_mode_message(std::string channel_name, std::string mode, in
     send_a_message(socket, msg);
 }
 
-
 std::string Server::get_channel_password(std::string channel_name) {
     return (this->channels[channel_name].get_channel_password());
+}
+
+bool Server::user_exist_in_channel(std::string username, std::string channel_name) {
+    std::vector <std::string> list;
+    std::cout << ":" << channel_name << ":" << username << "." << std::endl;
+    if (channel_exists(channel_name))
+    {
+        list = this->channels[channel_name].get_users_list();
+        if (find(list.begin(), list.end(), username) != list.end()) {
+            return (true);
+        }
+    }
+    return (false);
+}
+
+void    Server::remove_user_from_channel(std::string username, std::string channel_name) {
+    this->channels[channel_name].remove_user_from_channel_list(username);
 }
