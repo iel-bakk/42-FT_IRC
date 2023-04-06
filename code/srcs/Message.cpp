@@ -84,7 +84,7 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
 {
     int check = 0;
 
-    // std::cout << "message : " << message << std::endl << "pass : " << std::endl;
+    std::cout << "message : " << message << std::endl << "pass : " << std::endl;
     this->message = message;
     if (this->message[0] == ':')
     {

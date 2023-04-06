@@ -9,6 +9,7 @@ class Channel
 private:
     std:: string name;
     std::string mode;
+    std::string mode_param;
     std:: string password;
     std::vector <std::string>   users_list;
 
