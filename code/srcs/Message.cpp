@@ -428,17 +428,16 @@ int Message::parse_part_command(std::string request, Server& server) {
 
     channel_name = request.substr(request.find(' ') + 1);
     if (channel_name.find(':') != std::string::npos) {
-        std::cout << "here" << std::endl;
         message = channel_name.substr(channel_name.find(':') + 1);
         channel_name = channel_name.substr(1, channel_name.find(' ') - 1);
     }
     else {
-        std::cout << "not here" << std::endl;
-        channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find('\r'));
+        channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find('\r') - 1);
         std::cout << channel_name << "." << std::endl;
     }
     if (server.user_exist_in_channel(this->client.get_nick_name(), channel_name)) {
         server.remove_user_from_channel(this->client.get_nick_name(), channel_name);
+        server.send_message_to_channel(channel_name, message, this->client.get_nick_name());
     }
     else
         std::cout << "NO" <<std::endl;
