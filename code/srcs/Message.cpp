@@ -122,7 +122,7 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
         }
         else
         {
-            message = this->command + " " + this->message;
+            message = this->command + " " + this->message; // mafhemthach mzn ...
             this->params.push_back(message);
             break ;
         }
