@@ -10,6 +10,7 @@ private:
     std:: string name;
     std::vector <std::string> admins;
     std:: string password;
+    std::string mode;
     std::vector <std::string>   users_list;
 
 public:

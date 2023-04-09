@@ -417,6 +417,4 @@ bool Server::user_exist_in_channel(std::string username, std::string channel_nam
 
 void    Server::remove_user_from_channel(std::string username, std::string channel_name) {
     this->channels[channel_name].remove_user_from_channel_list(username);
-
-    
 }
