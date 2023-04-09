@@ -72,6 +72,7 @@ class Server
         std::string get_channel_password(std::string channel_name);
         bool        user_exist_in_channel(std::string username, std::string channel_name);
         void        remove_user_from_channel(std::string username, std::string channel_name);
+        void        send_part_message_to_channel(std::string channel_name, std::string message, std::string client);
 };
 
 #endif

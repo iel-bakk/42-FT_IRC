@@ -195,6 +195,12 @@ int Server:: HandleError(int error_replies, int sockfd)
         case 14:
             num = send_private_message();
             break;
+        case 403:
+            num = write(sockfd, "403 ERR_NOSUCHCHANNEL :No such channel\r\n", 40);
+            break;
+        case 404:
+            num = write(sockfd, "404 ERR_CANNOTSENDTOCHAN :Cannot send to channel\r\n", 49);
+            break;
         case 412:
             num = write(sockfd, "412 ERR_NOTEXTTOSEND :No text to send\r\n", 39);
             break;
@@ -417,4 +423,22 @@ bool Server::user_exist_in_channel(std::string username, std::string channel_nam
 
 void    Server::remove_user_from_channel(std::string username, std::string channel_name) {
     this->channels[channel_name].remove_user_from_channel_list(username);
+}
+
+void    Server::send_part_message_to_channel(std::string channel_name,std::string message, std::string client) {
+    std::map<int, Message> ::iterator it;
+    std::vector<std::string> list;
+    std::string msg;
+
+    list = this->channels[channel_name].get_users_list();
+    if (message.empty())
+        msg = ":" + client + " PART #" + channel_name + "\r\n";
+    else
+        msg = ":" + client + " PART #" + channel_name + " :" + message + "\r\n";
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
+    {
+        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end() && it->second.get_client().get_nick_name() != client)
+           if( send (it->second.get_socket(),msg.c_str(),msg.size(),0) < 0)
+                std::cout << "Error:  micaje not sind" << std::endl;
+    }
 }

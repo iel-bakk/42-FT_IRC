@@ -411,6 +411,8 @@ int Message::parse_channel_message(std::string request, Server& server) {
     }
     else
         channel_name = channel_name.substr(1, channel_name.find('\r'));
+    if (!server.user_exist_in_channel(this->client.get_nick_name(), channel_name))
+        return (404);
     if (server.channel_exists(channel_name) == true)
     {
         server.send_message_to_channel(channel_name, message,this->client.get_nick_name());
@@ -437,7 +439,7 @@ int Message::parse_part_command(std::string request, Server& server) {
     }
     if (server.user_exist_in_channel(this->client.get_nick_name(), channel_name)) {
         server.remove_user_from_channel(this->client.get_nick_name(), channel_name);
-        server.send_message_to_channel(channel_name, message, this->client.get_nick_name());
+        server.send_part_message_to_channel(channel_name, message, this->client.get_nick_name());
     }
     else
         std::cout << "NO" <<std::endl;
