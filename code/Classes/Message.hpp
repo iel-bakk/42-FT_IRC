@@ -65,6 +65,7 @@ public:
     int parse_channel_message(std::string request, Server& server);
     Client  get_client();
     int parse_part_command(std::string request, Server& server);
+    int parse_kick_command(std::string request, Server& server);
 };
 
 #endif

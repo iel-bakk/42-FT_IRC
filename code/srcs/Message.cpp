@@ -204,6 +204,11 @@ int Message:: check_my_vector(std:: string request, Server& server)
         check = parse_part_command(request, server);
         return (check);
     }
+    else if (this->command == "KICK")
+    {
+        check = parse_kick_command(request, server);
+        return (check);
+    }
     else if (this->command == "MODE") {
         //add mode code.
     }
@@ -266,7 +271,7 @@ int Message:: check_Error_Space(std:: string command)
     check = 0;
     if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos
         || command.find("JOIN") != std:: string:: npos || command.find("PART") != std:: string:: npos
-        || command.find("MODE") != std:: string:: npos)
+        || command.find("MODE") != std:: string:: npos || command.find("KICK") != std:: string:: npos)
         return check = 461;
     else if (command.find("NICK") != std:: string:: npos)
         return check = 431;
@@ -386,7 +391,8 @@ bool Message:: check_command(std:: string command)
 {
      if (command.find("PASS") != std:: string :: npos || command.find("NICK") != std:: string :: npos \
     || command.find("USER") != std:: string :: npos || command.find("PRIVMSG") != std:: string :: npos || command.find("NOTICE") != std:: string :: npos \
-    || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos || command.find("MODE") != std:: string :: npos)
+    || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos || command.find("MODE") != std:: string :: npos\
+    || command.find("KICK") != std:: string :: npos)
         return false;
     return true;
 }
@@ -432,6 +438,7 @@ int Message::parse_part_command(std::string request, Server& server) {
     if (channel_name.find(':') != std::string::npos) {
         message = channel_name.substr(channel_name.find(':') + 1);
         channel_name = channel_name.substr(1, channel_name.find(' ') - 1);
+        std::cout << "." << channel_name << "." << std::endl;
     }
     else {
         channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find('\r') - 1);        
@@ -442,5 +449,34 @@ int Message::parse_part_command(std::string request, Server& server) {
     }
     else
         std::cout << "NO" <<std::endl;
+    return (0);
+}
+
+int Message::parse_kick_command(std::string request, Server& server){
+    //kick command
+    std::string channel_name;
+    std::string kicked_user;
+    std::string reason;
+    (void)request;
+    (void)server;
+    if (request.find(' ') != std::string::npos) {
+        channel_name = request.substr(request.find(' ') + 1);
+        if (channel_name.find(' ') != std::string::npos) {
+            kicked_user = channel_name.substr(channel_name.find(' ') + 1);
+            if (kicked_user.find(':') != std::string::npos && kicked_user.find(":") + 1 != std::string::npos) {
+                reason = kicked_user.substr(kicked_user.find(":") + 1);
+                std::cout << channel_name << "." << kicked_user << "." << reason << "." << std::endl; 
+                // send kick message then remove user from list.
+            }
+            else {
+                std::cout << channel_name << "." << kicked_user << "." << std::endl; 
+                // send kick message then remove user from list.
+            }
+        }
+        else
+            return (461);
+    }
+    else
+        return (461);
     return (0);
 }

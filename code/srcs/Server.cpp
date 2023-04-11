@@ -363,7 +363,7 @@ void    Server::send_message_to_channel(std::string channel_name,std::string mes
     std::map<int, Message> ::iterator it;
     std::vector<std::string> list;
     std::string msg;
- //:<sender_nick>!~<sender_username>@<sender_hostname> PRIVMSG <target> :<message>
+
     list = this->channels[channel_name].get_users_list();
     msg = ":" + client + " PRIVMSG #" + channel_name + " : " + message + "\r\n";
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
@@ -380,7 +380,6 @@ void    Server::send_join_message(std::string username, std::string channel_name
     std::string msg;
     std::string join_message;
 
-    // join_message = ": JOIN " + channel_name + "\r\n";
     list = this->channels[channel_name].get_users_list();
     msg = ":" + username + " JOIN #" + channel_name + "\r\n";
     std::cout << msg ;
