@@ -434,12 +434,11 @@ int Message::parse_part_command(std::string request, Server& server) {
         channel_name = channel_name.substr(1, channel_name.find(' ') - 1);
     }
     else {
-        channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find('\r') - 1);
-        std::cout << channel_name << "." << std::endl;
+        channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find('\r') - 1);        
     }
     if (server.user_exist_in_channel(this->client.get_nick_name(), channel_name)) {
-        server.remove_user_from_channel(this->client.get_nick_name(), channel_name);
         server.send_part_message_to_channel(channel_name, message, this->client.get_nick_name());
+        server.remove_user_from_channel(this->client.get_nick_name(), channel_name);
     }
     else
         std::cout << "NO" <<std::endl;

@@ -24,6 +24,7 @@ public:
     void    empty_channel();
     void    add_admin(std::string user_nick);
     void    remove_user_from_channel_list(std::string username);
+    bool    is_admin(std::string username);
 };
 
 #endif

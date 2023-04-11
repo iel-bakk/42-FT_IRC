@@ -345,10 +345,12 @@ void    Server::send_channel_users_list(std::string channel_name, Message& clien
     end_list_msg = ": 366 " + client.get_client().get_nick_name() + " = " + channel_name + " :End of /NAMES list." + "\r\n";
     list_msg = ":irc_server 353 " + client.get_client().get_nick_name() + " = #" + channel_name + " :";
     list = this->channels[channel_name].get_users_list();
-    // this->send_a_message(client.get_socket(), join_msg);
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
         if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end()){
-            list_msg += it->second.get_client().get_nick_name() + " ";
+            if (this->channels[channel_name].is_admin(it->second.get_client().get_nick_name()))
+                list_msg += "@" + it->second.get_client().get_nick_name() + " ";
+            else
+                list_msg += it->second.get_client().get_nick_name() + " ";
         }
     }
     list_msg += "\r\n";
@@ -437,8 +439,12 @@ void    Server::send_part_message_to_channel(std::string channel_name,std::strin
         msg = ":" + client + " PART #" + channel_name + " :" + message + "\r\n";
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
     {
-        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end() && it->second.get_client().get_nick_name() != client)
-           if( send (it->second.get_socket(),msg.c_str(),msg.size(),0) < 0)
+        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end()){
+
+           if (send(it->second.get_socket(),msg.c_str(),msg.size(),0) < 0)
                 std::cout << "Error:  micaje not sind" << std::endl;
+        }
+        else
+            std::cout << "user :" << it->second.get_client().get_nick_name() << " not in channel." << std::endl;
     }
 }

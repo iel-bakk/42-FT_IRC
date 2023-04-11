@@ -75,3 +75,9 @@ void Channel::remove_user_from_channel_list(std::string username) {
         this->users_list.erase(it);
     }
 }
+
+bool    Channel::is_admin(std::string username) {
+    if (find(this->admins.begin(), this->admins.end(), username) != this->admins.end())
+        return (true);
+    return (false);
+}
