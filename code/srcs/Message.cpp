@@ -247,7 +247,7 @@ int Message:: check_Error_Space(std:: string command)
     int check;
    
     check = 0;
-    if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos || command.find("JOIN") != std:: string:: npos)
+    if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos || command.find("JOIN") != std:: string:: npos || command.find("MODE") != std:: string :: npos)
         return check = 461;
     else if (command.find("NICK") != std:: string:: npos)
         return check = 431;
@@ -366,7 +366,7 @@ bool Message:: check_command(std:: string command)
 {
      if (command.find("PASS") != std:: string :: npos || command.find("NICK") != std:: string :: npos \
     || command.find("USER") != std:: string :: npos || command.find("PRIVMSG") != std:: string :: npos || command.find("NOTICE") != std:: string :: npos \
-    || command.find("JOIN") != std:: string :: npos)
+    || command.find("JOIN") != std:: string :: npos || command.find("MODE") != std:: string :: npos)
         return false;
     return true;
 }

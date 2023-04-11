@@ -39,6 +39,11 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
     return (461);
 }
 
+int Channel::parse_mode(std::string mode, Channel& msg_channel)
+{
+    
+}
+
 void    Channel::add_user_to_list(std::string user_nick) {
     this->users_list.push_back(user_nick);
 }
