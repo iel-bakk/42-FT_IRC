@@ -23,18 +23,20 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
 
     tab = channel.substr(channel.find(' ') + 1);
     if (tab[0] == '#' || tab[0] == '&') {
-        if (tab.find(' ') != std::string::npos && tab.find(' ') + 1 < tab.length()) {
+        if (tab.find(' ') != std::string::npos && tab.find(' ') + 1 < tab.length() && tab[1] != ' ') {
             pass = tab.substr(tab.find(' ') + 1);
             tab = tab.substr(1, tab.find(' ') - 1);
             msg_channel.name = tab;
             msg_channel.password = pass;
             return (0);
         }
-        else {
+        else if (tab[1] != ' '){
             tab = tab.substr(1, tab.find('\r') - 1);
             msg_channel.name = tab;
             return (0);
         }
+        else
+            return (403);//Used to indicate the given channel name is invalid.
     }
     return (461);
 }
@@ -58,4 +60,29 @@ void    Channel::print_users_list() {
 
 std::vector<std::string> Channel::get_users_list() {
     return (this->users_list);
+}
+
+void    Channel::empty_channel() {
+    this->name = "";
+    this->password = "";
+}
+
+void    Channel::add_admin(std::string user_nick){
+    this->admins.push_back(user_nick);
+}
+
+void Channel::remove_user_from_channel_list(std::string username) {
+    if (this->users_list.empty()) {
+        return;
+    }
+    std::vector<std::string>::iterator it = std::find(this->users_list.begin(), this->users_list.end(), username);
+    if (it != this->users_list.end()) {
+        this->users_list.erase(it);
+    }
+}
+
+bool    Channel::is_admin(std::string username) {
+    if (find(this->admins.begin(), this->admins.end(), username) != this->admins.end())
+        return (true);
+    return (false);
 }

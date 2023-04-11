@@ -154,12 +154,6 @@ void Server:: read_write_socket(int sockfd, int *num_fds, Message *new_user)
         return ;
     }
     tab = buffer;
-    std::map<std::string, Channel>::iterator it;
-
-    for (it = this->channels.begin(); it != this->channels.end(); it++) {
-        std::cout << "channel : " << it->first << std::endl;
-        it->second.print_users_list();
-    }
     if (check_ctrl_D(tab))
         check = new_user->parse_message(this->password, this->_buffer, *this);
     n = HandleError(check, sockfd);
@@ -200,6 +194,12 @@ int Server:: HandleError(int error_replies, int sockfd)
             break;
         case 14:
             num = send_private_message();
+            break;
+        case 403:
+            num = write(sockfd, "403 ERR_NOSUCHCHANNEL :No such channel\r\n", 40);
+            break;
+        case 404:
+            num = write(sockfd, "404 ERR_CANNOTSENDTOCHAN :Cannot send to channel\r\n", 49);
             break;
         case 412:
             num = write(sockfd, "412 ERR_NOTEXTTOSEND :No text to send\r\n", 39);
@@ -325,7 +325,7 @@ void    Server::add_new_channel(Channel& new_channel) {
 }
 
 bool    Server::channel_exists(std::string channel) {
-    if (this->channels.find(channel) != this->channels.end())
+    if (this->channels.count(channel))
         return (true);
     return (false);
 }
@@ -337,31 +337,115 @@ void    Server::add_user_to_channel(std::string user, std::string channel) {
 void    Server::send_channel_users_list(std::string channel_name, Message& client) {
     std::map <int, Message>::iterator it;
     std::vector<std::string> list;
+    std::string list_msg;
+    std::string end_list_msg;
+    std::string join_msg;
 
+    join_msg = ": JOIN " + channel_name + "\r\n";
+    end_list_msg = ": 366 " + client.get_client().get_nick_name() + " = " + channel_name + " :End of /NAMES list." + "\r\n";
+    list_msg = ":irc_server 353 " + client.get_client().get_nick_name() + " = #" + channel_name + " :";
     list = this->channels[channel_name].get_users_list();
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
         if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end()){
-            std::string msg = it->second.get_client().get_nick_name() + '\n';
-            if (send(client.get_socket(), msg.c_str(), msg.size(), 0) < 0)
-                std::cout << "error : couldn't send message." << std::endl;
+            if (this->channels[channel_name].is_admin(it->second.get_client().get_nick_name()))
+                list_msg += "@" + it->second.get_client().get_nick_name() + " ";
+            else
+                list_msg += it->second.get_client().get_nick_name() + " ";
         }
     }
+    list_msg += "\r\n";
+    this->send_a_message(client.get_socket(), list_msg);
+    this->send_a_message(client.get_socket(), end_list_msg);
+    
 }
 
 void    Server::send_message_to_channel(std::string channel_name,std::string message, std::string client) {
     std::map<int, Message> ::iterator it;
     std::vector<std::string> list;
     std::string msg;
-
+ //:<sender_nick>!~<sender_username>@<sender_hostname> PRIVMSG <target> :<message>
     list = this->channels[channel_name].get_users_list();
-    msg = client + " :" + message + "\n";
+    msg = ":" + client + " PRIVMSG #" + channel_name + " : " + message + "\r\n";
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
     {
-        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end())
+        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end() && it->second.get_client().get_nick_name() != client)
+           if( send (it->second.get_socket(),msg.c_str(),msg.size(),0) < 0)
+                std::cout << "Error:  micaje not sind" << std::endl;
+    }
+}
+
+void    Server::send_join_message(std::string username, std::string channel_name) {
+    std::map<int, Message>::iterator it;
+    std::vector<std::string> list;
+    std::string msg;
+    std::string join_message;
+
+    // join_message = ": JOIN " + channel_name + "\r\n";
+    list = this->channels[channel_name].get_users_list();
+    msg = ":" + username + " JOIN #" + channel_name + "\r\n";
+    std::cout << msg ;
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
+    {
+        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end()) {
 
            if( send (it->second.get_socket(),msg.c_str(),msg.size(),0) < 0)
                 std::cout << "Error:  micaje not sind" << std::endl;
-            
+        }
+    }
+}
+
+void    Server::send_a_message(int socket, std::string message) {
+    if (send(socket, message.c_str(), message.size(), 0) < 0)
+        std::cout << "couldn't send message." << std::endl;
+}
+
+void    Server::send_mode_message(std::string channel_name, std::string mode, int socket) {
+    std::string msg;
+
+    msg = ":1337_irc_server MODE " + channel_name + " " + mode + "\r\n";
+    send_a_message(socket, msg);
+}
+
+std::string Server::get_channel_password(std::string channel_name) {
+    return (this->channels[channel_name].get_channel_password());
+}
+
+bool Server::user_exist_in_channel(std::string username, std::string channel_name) {
+    std::vector <std::string> list;
+    std::cout << ":" << channel_name << ":" << username << "." << std::endl;
+    if (channel_exists(channel_name))
+    {
+        list = this->channels[channel_name].get_users_list();
+        if (find(list.begin(), list.end(), username) != list.end()) {
+            return (true);
+        }
+    }
+    return (false);
+}
+
+void    Server::remove_user_from_channel(std::string username, std::string channel_name) {
+    this->channels[channel_name].remove_user_from_channel_list(username);
+}
+
+void    Server::send_part_message_to_channel(std::string channel_name,std::string message, std::string client) {
+    std::map<int, Message> ::iterator it;
+    std::vector<std::string> list;
+    std::string msg;
+
+    list = this->channels[channel_name].get_users_list();
+    if (message.empty())
+        msg = ":" + client + " PART #" + channel_name + "\r\n";
+    else
+        msg = ":" + client + " PART #" + channel_name + " :" + message + "\r\n";
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
+    {
+        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end()){
+
+           if (send(it->second.get_socket(),msg.c_str(),msg.size(),0) < 0)
+                std::cout << "Error:  micaje not sind" << std::endl;
+        }
+        else
+            std::cout << "user :" << it->second.get_client().get_nick_name() << " not in channel." << std::endl;
     }
 }
 

@@ -84,7 +84,7 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
 {
     int check = 0;
 
-    std::cout << "message : " << message << std::endl << "pass : " << std::endl;
+    // std::cout << "message : " << message << std::endl << "pass : " << std::endl;
     this->message = message;
     if (this->message[0] == ':')
     {
@@ -155,14 +155,23 @@ int Message:: check_my_vector(std:: string request, Server& server)
         check = channel.parse_channel(request, this->channel);
         if (check == 0){
             if (!server.channel_exists(this->channel.get_channel_name())) {
+                this->channel.add_admin(this->client.get_nick_name());
                 server.add_new_channel(this->channel);
                 server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
+                server.send_join_message(this->client.get_nick_name(), this->channel.get_channel_name());
                 server.send_channel_users_list(this->channel.get_channel_name(), *this);
             }
             else {
-                server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
-                server.send_channel_users_list(this->channel.get_channel_name(), *this);
+                if (this->channel.get_channel_password() == server.get_channel_password(this->channel.get_channel_name())) {
+                    server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
+                    server.send_join_message(this->client.get_nick_name(), this->channel.get_channel_name());
+                    server.send_channel_users_list(this->channel.get_channel_name(), *this);
+                }
+                else {
+                    check = 464;
+                }
             }
+            this->channel.empty_channel();
         }
     }
     else if (this->command == "PRIVMSG")
@@ -189,6 +198,14 @@ int Message:: check_my_vector(std:: string request, Server& server)
         }
         else
             check = 451;
+    }
+    else if (this->command == "PART")
+    {
+        check = parse_part_command(request, server);
+        return (check);
+    }
+    else if (this->command == "MODE") {
+        //add mode code.
     }
    check = send_Message_identification(check);
    return (check);
@@ -247,7 +264,7 @@ int Message:: check_Error_Space(std:: string command)
     int check;
    
     check = 0;
-    if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos || command.find("JOIN") != std:: string:: npos || command.find("MODE") != std:: string :: npos)
+    if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos || command.find("JOIN") != std:: string:: npos)
         return check = 461;
     else if (command.find("NICK") != std:: string:: npos)
         return check = 431;
@@ -259,7 +276,7 @@ int Message:: check_message(std:: string command)
     int check;
    
     check = 0;
-    if (command.find("USER") != std:: string:: npos || command.find("NICK") != std:: string:: npos || command.find("NICK") != std:: string:: npos)
+    if (command.find("USER") != std:: string:: npos || command.find("NICK") != std:: string:: npos || command.find("PASS") != std:: string:: npos)
     {
         if (this->command == "NICK")
             return check = 432;
@@ -279,7 +296,8 @@ int Message:: send_Message_identification(int check)
     gethostname(hostname, sizeof(hostname));
     if (client.get_nick_name().size() != 0 && client.get_user_name().size() != 0 && this->enter == false)
     {
-        this->welcome_message = ": 001 " + client.get_nick_name() + " Welcome to Internet Chat Relay";
+        this->hostname = std::string(hostname);
+        this->welcome_message = ":irc.1337.ma 001 " + client.get_nick_name() + " : Welcome to Internet Chat Relay";
         this->host_message = ": 002 " + client.get_nick_name() + " Your Host is " + std:: string(hostname) + ", running version 1.0";
         this->server_message = ": 003 " + client.get_nick_name() + " Ther server was created on " + std:: string(time_str);
         this->enter = true;
@@ -366,7 +384,7 @@ bool Message:: check_command(std:: string command)
 {
      if (command.find("PASS") != std:: string :: npos || command.find("NICK") != std:: string :: npos \
     || command.find("USER") != std:: string :: npos || command.find("PRIVMSG") != std:: string :: npos || command.find("NOTICE") != std:: string :: npos \
-    || command.find("JOIN") != std:: string :: npos || command.find("MODE") != std:: string :: npos)
+    || command.find("JOIN") != std:: string :: npos)
         return false;
     return true;
 }
@@ -391,18 +409,36 @@ int Message::parse_channel_message(std::string request, Server& server) {
     }
     else
         channel_name = channel_name.substr(1, channel_name.find('\r'));
+    if (!server.user_exist_in_channel(this->client.get_nick_name(), channel_name))
+        return (404);
     if (server.channel_exists(channel_name) == true)
     {
         server.send_message_to_channel(channel_name, message,this->client.get_nick_name());
-        // message = this->client.get_nick_name() + " : " + message;
-        // if (send(this->socket, message.c_str(), message.size(), 0) < 0)
-        // {
-        //     std::cout << "error : couldn't send message." << std::endl;
-        // }
     }
     return (0);
 }
 
 Client  Message::get_client() {
     return (this->client);
+}
+
+int Message::parse_part_command(std::string request, Server& server) {
+    std::string channel_name;
+    std::string message;
+
+    channel_name = request.substr(request.find(' ') + 1);
+    if (channel_name.find(':') != std::string::npos) {
+        message = channel_name.substr(channel_name.find(':') + 1);
+        channel_name = channel_name.substr(1, channel_name.find(' ') - 1);
+    }
+    else {
+        channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find('\r') - 1);        
+    }
+    if (server.user_exist_in_channel(this->client.get_nick_name(), channel_name)) {
+        server.send_part_message_to_channel(channel_name, message, this->client.get_nick_name());
+        server.remove_user_from_channel(this->client.get_nick_name(), channel_name);
+    }
+    else
+        std::cout << "NO" <<std::endl;
+    return (0);
 }
