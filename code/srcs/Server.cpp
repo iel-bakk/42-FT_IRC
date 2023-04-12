@@ -356,7 +356,6 @@ void    Server::send_channel_users_list(std::string channel_name, Message& clien
     list_msg += "\r\n";
     this->send_a_message(client.get_socket(), list_msg);
     this->send_a_message(client.get_socket(), end_list_msg);
-    
 }
 
 void    Server::send_message_to_channel(std::string channel_name,std::string message, std::string client) {

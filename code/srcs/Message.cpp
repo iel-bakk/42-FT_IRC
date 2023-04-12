@@ -453,24 +453,24 @@ int Message::parse_part_command(std::string request, Server& server) {
 }
 
 int Message::parse_kick_command(std::string request, Server& server){
-    //kick command
     std::string channel_name;
     std::string kicked_user;
     std::string reason;
-    (void)request;
+
     (void)server;
-    if (request.find(' ') != std::string::npos) {
-        channel_name = request.substr(request.find(' ') + 1);
+    if (request.find('#') != std::string::npos) {
+        channel_name = request.substr(request.find('#') + 1);
         if (channel_name.find(' ') != std::string::npos) {
             kicked_user = channel_name.substr(channel_name.find(' ') + 1);
-            if (kicked_user.find(':') != std::string::npos && kicked_user.find(":") + 1 != std::string::npos) {
+            if (kicked_user.find(':') != std::string::npos) {
                 reason = kicked_user.substr(kicked_user.find(":") + 1);
-                std::cout << channel_name << "." << kicked_user << "." << reason << "." << std::endl; 
-                // send kick message then remove user from list.
+                channel_name = channel_name.substr(0, channel_name.find(' '));
+                kicked_user = kicked_user.substr(0,kicked_user.find(' '));
+                
             }
             else {
+                channel_name = channel_name.substr(0, channel_name.find(' '));
                 std::cout << channel_name << "." << kicked_user << "." << std::endl; 
-                // send kick message then remove user from list.
             }
         }
         else
