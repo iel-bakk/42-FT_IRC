@@ -195,8 +195,11 @@ int Server:: HandleError(int error_replies, int sockfd)
         case 14:
             num = send_private_message();
             break;
+        case 401:
+            num = write(sockfd, "401 ERR_NOSUCHNICK :No such nick\r\n", 33);
+            break;
         case 403:
-            num = write(sockfd, "403 ERR_NOSUCHCHANNEL :No such channel\r\n", 40);
+            num = write(sockfd, "403 ERR_NOSUCHCHANNEL :No such channel\r\n", 39);
             break;
         case 404:
             num = write(sockfd, "404 ERR_CANNOTSENDTOCHAN :Cannot send to channel\r\n", 49);

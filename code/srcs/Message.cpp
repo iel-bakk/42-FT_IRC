@@ -467,11 +467,25 @@ int Message::parse_kick_command(std::string request, Server& server){
                 reason = kicked_user.substr(kicked_user.find(":") + 1);
                 channel_name = channel_name.substr(0, channel_name.find(' '));
                 kicked_user = kicked_user.substr(0,kicked_user.find(' '));
-                server.send_kick_message_to_channel(channel_name, kicked_user, reason, this->client.get_nick_name());
+                if (server.channel_exists(channel_name)) {
+                    if (server.user_exist_in_channel(kicked_user, channel_name))
+                        server.send_kick_message_to_channel(channel_name, kicked_user, reason, this->client.get_nick_name());
+                    else
+                        return (401);
+                }
+                else
+                    return (403);
             }
             else {
                 channel_name = channel_name.substr(0, channel_name.find(' '));
-                server.send_kick_message_to_channel(channel_name, kicked_user, "", this->client.get_nick_name());
+                if (server.channel_exists(channel_name)) {
+                    if (server.user_exist_in_channel(kicked_user, channel_name))
+                        server.send_kick_message_to_channel(channel_name, kicked_user, "", this->client.get_nick_name());
+                    else
+                        return (401);
+                }
+                else
+                    return (403);
             }
         }
         else
