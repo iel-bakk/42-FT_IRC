@@ -205,7 +205,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
         return (check);
     }
     else if (this->command == "MODE") {
-        //add mode code.
+        parse_Mode_command(request, server);
     }
    check = send_Message_identification(check);
    return (check);
@@ -384,7 +384,7 @@ bool Message:: check_command(std:: string command)
 {
      if (command.find("PASS") != std:: string :: npos || command.find("NICK") != std:: string :: npos \
     || command.find("USER") != std:: string :: npos || command.find("PRIVMSG") != std:: string :: npos || command.find("NOTICE") != std:: string :: npos \
-    || command.find("JOIN") != std:: string :: npos)
+    || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos)
         return false;
     return true;
 }
@@ -441,4 +441,56 @@ int Message::parse_part_command(std::string request, Server& server) {
     else
         std::cout << "NO" <<std::endl;
     return (0);
+}
+
+int Message::parse_Mode_command(std::string request, Server& server)
+{
+    std::string channel_name;
+    std::string mode;
+    std::string param;
+
+    if (request.find('+') == std::string::npos && request.find('-') == std::string::npos)
+        return (461);
+    if (request.find(' ') != std::string::npos && request.find(' ') + 1 != std::string::npos)// find #
+    {
+        if (channel_name.find(' ') != std::string::npos)
+        {
+            channel_name = request.substr(request.find(' ') + 1);
+            mode = channel_name.substr(channel_name.find(' ') + 1);
+            if (mode.find(' ') != std::string::npos)
+            {
+                param = mode.substr(mode.find(' ') + 1);
+                mode = mode.substr(1, mode.find(' '));
+                channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find(' '));
+                if(mode[0] == '+')
+                    add_mode_to_channel(mode, channel_name ,param);
+                else if(mode[0] == '-')
+                    remove_mode_from_channel(mode, channel_name,param);
+                else 
+                     return (461); 
+                return (0);
+            }
+            else
+            {
+                mode = mode.substr(1, mode.find(' '));
+                channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find(' '));
+                 if(mode[0] == '+')
+                    add_mode_to_channel(mode, channel_name , NULL);
+                else if(mode[0] == '-')
+                    remove_mode_from_channel(mode, channel_name,NULL);
+                else 
+                     return (461); 
+                return (0);
+            }
+        }
+        else
+            return (461);
+    }
+    return (461); 
+}
+
+
+void Message::add_mode_to_channel(std::string mode, std::string channel_name, std::string params)
+{
+    
 }
