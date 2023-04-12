@@ -446,3 +446,20 @@ void    Server::send_part_message_to_channel(std::string channel_name,std::strin
             std::cout << "user :" << it->second.get_client().get_nick_name() << " not in channel." << std::endl;
     }
 }
+
+void    Server::send_kick_message_to_channel(std::string channel_name, std::string kicked_user, std::string reason, std::string kicker){
+    std::string message;
+    std::vector<std::string> list;
+    std::map<int, Message>::iterator it;
+
+    list = this->channels[channel_name].get_users_list();
+    if (!reason.empty())
+        message = ":KICK #" + channel_name + " " + kicked_user + " :" + reason + "\r\n";
+    else
+        message = ":KICK #" + channel_name + " " + kicked_user + "\r\n";
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
+        if (find(list.begin(), list.end(), kicker) != list.end()){
+            send_a_message(it->second.get_socket(), message);
+        }
+    }    
+}
