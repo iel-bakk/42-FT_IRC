@@ -30,6 +30,7 @@ private:
     std:: vector<std:: string> params;
     Client client;
     Channel channel;
+    std::vector<std::string> joined_channels;
     std::map<std::string, Channel> channels;
 
 public:
@@ -66,6 +67,7 @@ public:
     Client  get_client();
     int parse_part_command(std::string request, Server& server);
     int parse_kick_command(std::string request, Server& server);
+    void    add_a_channel_to_list(std::string channel);
 };
 
 #endif

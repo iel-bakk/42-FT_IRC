@@ -171,6 +171,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
                     check = 464;
                 }
             }
+            this->add_a_channel_to_list(this->channel.get_channel_name());
             this->channel.empty_channel();
         }
     }
@@ -479,4 +480,8 @@ int Message::parse_kick_command(std::string request, Server& server){
     else
         return (461);
     return (0);
+}
+
+void    Message::add_a_channel_to_list(std::string channel) {
+    this->joined_channels.push_back(channel);
 }

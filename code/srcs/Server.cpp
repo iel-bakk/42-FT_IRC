@@ -454,11 +454,11 @@ void    Server::send_kick_message_to_channel(std::string channel_name, std::stri
 
     list = this->channels[channel_name].get_users_list();
     if (!reason.empty())
-        message = ":KICK #" + channel_name + " " + kicked_user + " :" + reason + "\r\n";
+        message = ":" +  kicker + " KICK #" + channel_name + " " + kicked_user + " :" + reason + "\r\n";
     else
-        message = ":KICK #" + channel_name + " " + kicked_user + "\r\n";
+        message = ":" +  kicker + " KICK #" + channel_name + " " + kicked_user + "\r\n";
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
-        if (find(list.begin(), list.end(), kicker) != list.end()){
+        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end()){
             send_a_message(it->second.get_socket(), message);
         }
     }    
