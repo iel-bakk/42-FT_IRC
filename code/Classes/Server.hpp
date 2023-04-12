@@ -74,6 +74,7 @@ class Server
         void        remove_user_from_channel(std::string username, std::string channel_name);
         void        send_part_message_to_channel(std::string channel_name, std::string message, std::string client);
         void        send_kick_message_to_channel(std::string channel_name, std::string kicked_user, std::string reason, std::string kicker);
+        bool        is_admin(std::string channel_name, std::string username);
 };
 
 #endif

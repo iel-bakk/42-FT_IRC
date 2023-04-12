@@ -230,6 +230,9 @@ int Server:: HandleError(int error_replies, int sockfd)
         case 462:
             num = write(sockfd, "462 ERR_ALREADYREGISTRED USER :Unauthorized command (already registered)\r\n", 74);
             break;
+        case 482:
+            num = write(sockfd, "482 ERR_CHANOPRIVSNEEDED You're not channel operator\r\n", 53);
+            break;
         default:
             break;
     }
@@ -465,4 +468,8 @@ void    Server::send_kick_message_to_channel(std::string channel_name, std::stri
             send_a_message(it->second.get_socket(), message);
         }
     }    
+}
+
+bool    Server::is_admin(std::string channel_name, std::string username) {
+    return (this->channels[channel_name].is_admin(username));
 }

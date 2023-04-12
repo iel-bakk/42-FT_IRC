@@ -458,7 +458,6 @@ int Message::parse_kick_command(std::string request, Server& server){
     std::string kicked_user;
     std::string reason;
 
-    (void)server;
     if (request.find('#') != std::string::npos) {
         channel_name = request.substr(request.find('#') + 1);
         if (channel_name.find(' ') != std::string::npos) {
@@ -468,8 +467,14 @@ int Message::parse_kick_command(std::string request, Server& server){
                 channel_name = channel_name.substr(0, channel_name.find(' '));
                 kicked_user = kicked_user.substr(0,kicked_user.find(' '));
                 if (server.channel_exists(channel_name)) {
-                    if (server.user_exist_in_channel(kicked_user, channel_name))
-                        server.send_kick_message_to_channel(channel_name, kicked_user, reason, this->client.get_nick_name());
+                    if (server.user_exist_in_channel(kicked_user, channel_name)) {
+                        if (server.is_admin(channel_name, this->client.get_nick_name())) {
+                            server.send_kick_message_to_channel(channel_name, kicked_user, reason, this->client.get_nick_name());
+                            server.remove_user_from_channel(kicked_user, channel_name);
+                        }
+                        else
+                            return (482);
+                    }
                     else
                         return (401);
                 }
@@ -479,8 +484,14 @@ int Message::parse_kick_command(std::string request, Server& server){
             else {
                 channel_name = channel_name.substr(0, channel_name.find(' '));
                 if (server.channel_exists(channel_name)) {
-                    if (server.user_exist_in_channel(kicked_user, channel_name))
-                        server.send_kick_message_to_channel(channel_name, kicked_user, "", this->client.get_nick_name());
+                    if (server.user_exist_in_channel(kicked_user, channel_name)) {
+                        if (server.user_exist_in_channel(kicked_user, channel_name)) {
+                            server.send_kick_message_to_channel(channel_name, kicked_user, "", this->client.get_nick_name());
+                            server.remove_user_from_channel(kicked_user, channel_name);
+                        }
+                        else
+                            return (482);
+                    }
                     else
                         return (401);
                 }
