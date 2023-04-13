@@ -151,7 +151,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
     else if (this->command == "USER")
         check = client.parse_username(request);
     else if (this->command == "JOIN")
-    {   
+    {
         check = channel.parse_channel(request, this->channel);
         if (check == 0){
             if (!server.channel_exists(this->channel.get_channel_name())) {
@@ -455,7 +455,7 @@ int Message::parse_part_command(std::string request, Server& server) {
     return (0);
 }
 
-int Message::parse_kick_command(std::string request, Server& server){
+int Message::parse_kick_command(std::string request, Server& server) {
     std::string channel_name;
     std::string kicked_user;
     std::string reason;
@@ -469,7 +469,7 @@ int Message::parse_kick_command(std::string request, Server& server){
                 channel_name = channel_name.substr(0, channel_name.find(' '));
                 kicked_user = kicked_user.substr(0,kicked_user.find(' '));
                 if (server.channel_exists(channel_name)) {
-                    if (server.user_exist_in_channel(kicked_user, channel_name)) {
+                    if (server.user_exist_in_channel(kicked_user, channel_name) && server.user_exist_in_channel(this->client.get_nick_name(), channel_name)) {
                         if (server.is_admin(channel_name, this->client.get_nick_name())) {
                             server.send_kick_message_to_channel(channel_name, kicked_user, reason, this->client.get_nick_name());
                             server.remove_user_from_channel(kicked_user, channel_name);
@@ -486,8 +486,8 @@ int Message::parse_kick_command(std::string request, Server& server){
             else {
                 channel_name = channel_name.substr(0, channel_name.find(' '));
                 if (server.channel_exists(channel_name)) {
-                    if (server.user_exist_in_channel(kicked_user, channel_name)) {
-                        if (server.user_exist_in_channel(kicked_user, channel_name)) {
+                    if (server.user_exist_in_channel(kicked_user, channel_name) && server.user_exist_in_channel(this->client.get_nick_name(), channel_name)) {
+                        if (server.is_admin(channel_name, this->client.get_nick_name())) {
                             server.send_kick_message_to_channel(channel_name, kicked_user, "", this->client.get_nick_name());
                             server.remove_user_from_channel(kicked_user, channel_name);
                         }

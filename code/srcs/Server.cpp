@@ -196,7 +196,7 @@ int Server:: HandleError(int error_replies, int sockfd)
             num = send_private_message();
             break;
         case 401:
-            num = write(sockfd, "401 ERR_NOSUCHNICK :No such nick\r\n", 33);
+            num = write(sockfd, "401 ERR_NOSUCHNICK :No such nick\r\n", 34);
             break;
         case 403:
             num = write(sockfd, "403 ERR_NOSUCHCHANNEL :No such channel\r\n", 39);
@@ -231,7 +231,7 @@ int Server:: HandleError(int error_replies, int sockfd)
             num = write(sockfd, "462 ERR_ALREADYREGISTRED USER :Unauthorized command (already registered)\r\n", 74);
             break;
         case 482:
-            num = write(sockfd, "482 ERR_CHANOPRIVSNEEDED You're not channel operator\r\n", 53);
+            num = write(sockfd, "482 ERR_CHANOPRIVSNEEDED You're not channel operator\r\n", 54);
             break;
         default:
             break;
