@@ -202,7 +202,7 @@ int Server:: HandleError(int error_replies, int sockfd)
             num = write(sockfd, "403 ERR_NOSUCHCHANNEL :No such channel\r\n", 39);
             break;
         case 404:
-            num = write(sockfd, "404 ERR_CANNOTSENDTOCHAN :Cannot send to channel\r\n", 49);
+            num = write(sockfd, "404 ERR_CANNOTSENDTOCHAN :Cannot send to channel\r\n", 50);
             break;
         case 412:
             num = write(sockfd, "412 ERR_NOTEXTTOSEND :No text to send\r\n", 39);
