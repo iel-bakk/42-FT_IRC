@@ -10,6 +10,7 @@ make the one that creates the channel it's operator.
         MODE    - Change the channel's mode
         INVITE  - Invite a client to an invite-only channel (mode +i)
         TOPIC   - Change the channel topic in a mode +t channel
+        LIST
 
    A channel operator is identified by the '@' symbol next to their
    nickname whenever it is associated with a channel (ie replies to the
