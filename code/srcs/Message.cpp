@@ -84,8 +84,12 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
 {
     int check = 0;
 
-    std::cout << message << std::endl;
     this->message = message;
+        if (strncmp("LIST", message.c_str(), 4) == 0) {
+        check = parse_list_command(message, server);
+    }
+    else {
+
     if (this->message[0] == ':')
     {
         size_t prefix_end = this->message.find(' ');
@@ -130,6 +134,7 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
     check = check_my_vector(this->params.back(), server);
     if (check != 0 && check != 13 && check != 14)
         this->params.erase(this->params.end() - 1);
+    }
     return (check);
 }
 
@@ -138,6 +143,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
    int check;
     check = 0;
 
+    std::cout << "cmd: " << this->command << std::endl;
     if (this->command == "NICK")
     {
         if (this->message.empty())
@@ -210,6 +216,11 @@ int Message:: check_my_vector(std:: string request, Server& server)
     else if (this->command == "KICK")
     {
         check = parse_kick_command(request, server);
+        return (check);
+    }
+    else if (this->command == "LIST") {
+        std::cout << "0000" << std::endl;
+        check = this->parse_list_command(request, server);
         return (check);
     }
     else if (this->command == "MODE") {
@@ -395,7 +406,7 @@ bool Message:: check_command(std:: string command)
      if (command.find("PASS") != std:: string :: npos || command.find("NICK") != std:: string :: npos \
     || command.find("USER") != std:: string :: npos || command.find("PRIVMSG") != std:: string :: npos || command.find("NOTICE") != std:: string :: npos \
     || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos || command.find("MODE") != std:: string :: npos\
-    || command.find("KICK") != std:: string :: npos)
+    || command.find("KICK") != std:: string :: npos || command.find("LIST") != std:: string :: npos)
         return false;
     return true;
 }
@@ -511,4 +522,18 @@ int Message::parse_kick_command(std::string request, Server& server) {
 
 void    Message::add_a_channel_to_list(std::string channel) {
     this->joined_channels.push_back(channel);
+}
+
+int Message::parse_list_command(std::string request, Server& server) {
+    std::cout << "LIST accepted" << std::endl;
+    (void)request;
+
+    server.send_channels_list(this->socket, "", this->client.get_nick_name());
+    return (0);
+}
+
+int Message::early_list_parse(std::string request, Server& server) {
+    (void)request;
+    (void)server;
+    return (0);
 }

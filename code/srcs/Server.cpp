@@ -473,3 +473,15 @@ void    Server::send_kick_message_to_channel(std::string channel_name, std::stri
 bool    Server::is_admin(std::string channel_name, std::string username) {
     return (this->channels[channel_name].is_admin(username));
 }
+
+void    Server::send_channels_list(int socket, std::string search, std::string user) {
+    std::map<std::string, Channel>::iterator it;
+    std::string message;
+
+    if (search.empty()) {
+        for (it = this->channels.begin(); it != this->channels.end(); it++) {
+            message = ":irc_server 322 " + user + " #" +  it->second.get_channel_name() + " " + std::to_string(it->second.get_users_list().size()) + "\r\n";
+            send_a_message(socket, message);
+        }
+    }
+}

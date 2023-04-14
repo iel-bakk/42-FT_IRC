@@ -18,9 +18,9 @@ make the one that creates the channel it's operator.
 
 
 // part 2
-     if user is already in channel send him a message that he can't join
+     if user is already in channel send him a message that he can't join : done
      check if the error messages are well displayed
-     remove the admin for the user if he leaves the channel
+     remove the admin for the user if he leaves the channel : no need
      check the commands parsing for any error
      
      - 412 - 414 are returned by PRIVMSG to indicate that
@@ -28,5 +28,3 @@ make the one that creates the channel it's operator.
                   ERR_NOTOPLEVEL and ERR_WILDTOPLEVEL are errors that
                   are returned when an invalid use of
                   "PRIVMSG $<server>" or "PRIVMSG #<host>" is attempted.
- 421     ERR_UNKNOWNCOMMAND
-                        "<command> :Unknown command"
