@@ -176,6 +176,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
                     server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
                     server.send_join_message(this->client.get_nick_name(), this->channel.get_channel_name());
                     server.send_channel_users_list(this->channel.get_channel_name(), *this);
+                    server.send_topic_message_for_new_members(this->socket, this->channel.get_channel_name());
                 }
                 else {
                     check = 464;
@@ -560,7 +561,6 @@ int Message::parse_topic(std::string request, Server& server){
     std::string first_param;
     std::string second_param;
 
-    (void)server;
     if (request.find("#") == std::string::npos)
         return (461);
     first_param = request.substr(request.find('#'));
@@ -572,8 +572,10 @@ int Message::parse_topic(std::string request, Server& server){
         return (461);
     second_param = second_param.substr(1, second_param.find('\r'));
     if (server.channel_exists(first_param)) {
-        if (server.is_admin(first_param ,this->client.get_nick_name()))
-            server.get_channel(first_param).set_topic(second_param);
+        if (server.is_admin(first_param ,this->client.get_nick_name())) {
+            server.send_topic_message(first_param, second_param);
+            server.set_topic_to_channel(first_param, second_param);
+        }
         else
             return (482);
     }

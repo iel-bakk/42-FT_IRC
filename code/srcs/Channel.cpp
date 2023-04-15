@@ -21,17 +21,21 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
     std:: string tab;
     std::string pass;
 
-    tab = channel.substr(channel.find(' ') + 1);
-    if ((tab[0] == '#' || tab[0] == '&') && !is_empty(tab.substr(0, tab.find('\r') - 1))) {
+    if (channel.find('#') != std::string::npos) {
+        tab = channel.substr(channel.find('#') + 1);
         if (tab.find(' ') != std::string::npos && tab.find(' ') + 1 < tab.length() && tab[1] != ' ') {
             pass = tab.substr(tab.find(' ') + 1, tab.find('\r') - 1);
             tab = tab.substr(1, tab.find(' ') - 1);
+            if (!is_empty(pass))
+                msg_channel.password = pass;
             msg_channel.name = tab;
-            msg_channel.password = pass;
             return (0);
         }
         else if (tab[1] != ' '){
-            tab = tab.substr(1, tab.find('\r') - 1);
+            if (tab.find(' ') != std::string::npos)
+                tab = tab.substr(0, tab.find(' '));
+            else
+                tab = tab.substr(0, tab.find('\r'));
             msg_channel.name = tab;
             return (0);
         }
@@ -91,10 +95,8 @@ bool    Channel::is_empty(std::string check) {
     return (true);
 }
 
-bool        Channel::set_topic(std::string _topic) {
-    if (!_topic.empty())
-        this->topic = _topic;
-    return (false);
+void        Channel::set_topic(std::string _topic) {
+    this->topic = _topic;
 }
 
 std::string Channel::get_topic() {

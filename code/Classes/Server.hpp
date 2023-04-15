@@ -77,6 +77,9 @@ class Server
 		bool        is_admin(std::string channel_name, std::string username);
 		void        send_channels_list(int socket, std::string search, std::string user);
 		Channel		get_channel(std::string channel_name);
+    	void        send_topic_message(std::string channel, std::string topic);
+		void		send_topic_message_for_new_members(int socket, std::string channel);
+		void		set_topic_to_channel(std::string channel, std::string topic);
 };
 
 #endif

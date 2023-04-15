@@ -28,7 +28,7 @@ public:
     bool            is_admin(std::string username);
     bool            check_join_request(std::string request);
     bool            is_empty(std::string check);
-    bool            set_topic(std::string _topic);
+    void            set_topic(std::string _topic);
     std::string     get_topic();
 };
 

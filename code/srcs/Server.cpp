@@ -497,3 +497,29 @@ void    Server::send_channels_list(int socket, std::string search, std::string u
         }
     }
 }
+
+// ":<server> TOPIC <channel> :<new topic>"
+void    Server::send_topic_message(std::string channel, std::string topic) {
+    std::string message;
+    std::map<int, Message>::iterator it;
+    std::vector<std::string>    users_list;
+
+    users_list = this->channels[channel].get_users_list();
+    message = ":irc_server TOPIC #" + channel + " :" + topic + "\r\n";
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
+        if (find(users_list.begin(), users_list.end(), it->second.get_client().get_nick_name()) != users_list.end())
+            send_a_message(it->second.get_socket(), message);
+    }
+}
+
+void    Server::send_topic_message_for_new_members(int socket, std::string channel) {
+    std::string message;
+
+    message = message = ":irc_server TOPIC #" + channel + " :" + this->channels[channel].get_topic() + "\r\n";
+    send_a_message(socket, message);
+}
+
+void    Server::set_topic_to_channel(std::string channel, std::string topic) {
+    if (channel_exists(channel))
+        this->channels[channel].set_topic(topic);
+}
