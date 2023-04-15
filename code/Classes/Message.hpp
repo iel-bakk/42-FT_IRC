@@ -38,7 +38,6 @@ public :
     Message(int socket);
     Message(std:: string message);
     ~Message();
-
     std:: string	get_message(void);
     std:: string	get_welcome_message(void);
     std:: string	get_host_message(void);
