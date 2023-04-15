@@ -457,7 +457,7 @@ int Message::parse_part_command(std::string request, Server& server) {
         server.remove_user_from_channel(this->client.get_nick_name(), channel_name);
     }
     else
-        std::cout << "NO" <<std::endl;
+        return (403);
     return (0);
 }
 
