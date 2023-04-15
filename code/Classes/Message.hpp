@@ -69,6 +69,7 @@ public :
     int				parse_list_command(std::string request, Server& server);
     void			add_a_channel_to_list(std::string channel);
     bool            check_list_param(std::string param);
+    int             parse_topic(std::string request, Server& server);
 };
 
 #endif

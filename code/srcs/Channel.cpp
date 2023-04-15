@@ -90,3 +90,13 @@ bool    Channel::is_empty(std::string check) {
     }
     return (true);
 }
+
+bool        Channel::set_topic(std::string _topic) {
+    if (!_topic.empty())
+        this->topic = _topic;
+    return (false);
+}
+
+std::string Channel::get_topic() {
+    return (this->topic);
+}

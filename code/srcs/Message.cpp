@@ -156,6 +156,8 @@ int Message:: check_my_vector(std:: string request, Server& server)
     }
     else if (this->command == "USER")
         check = client.parse_username(request);
+    else if (this->command == "TOPIC")
+        check = parse_topic(request, server);
     else if (this->command == "JOIN")
     {
         check = channel.parse_channel(request, this->channel);
@@ -280,7 +282,8 @@ int Message:: check_Error_Space(std:: string command)
     check = 0;
     if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos
         || command.find("JOIN") != std:: string:: npos || command.find("PART") != std:: string:: npos
-        || command.find("MODE") != std:: string:: npos || command.find("KICK") != std:: string:: npos)
+        || command.find("MODE") != std:: string:: npos || command.find("KICK") != std:: string:: npos
+        || command.find("TOPIC") != std:: string:: npos)
         return check = 461;
     else if (command.find("NICK") != std:: string:: npos)
         return check = 431;
@@ -401,7 +404,7 @@ bool Message:: check_command(std:: string command)
      if (command.find("PASS") != std:: string :: npos || command.find("NICK") != std:: string :: npos \
     || command.find("USER") != std:: string :: npos || command.find("PRIVMSG") != std:: string :: npos || command.find("NOTICE") != std:: string :: npos \
     || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos || command.find("MODE") != std:: string :: npos\
-    || command.find("KICK") != std:: string :: npos || command.find("LIST") != std:: string :: npos)
+    || command.find("KICK") != std:: string :: npos || command.find("LIST") != std:: string :: npos || command.find("TOPIC") != std:: string:: npos)
         return false;
     return true;
 }
@@ -551,4 +554,30 @@ bool    Message::check_list_param(std::string param) {
             return (false);
     }
     return (true);
+}
+
+int Message::parse_topic(std::string request, Server& server){
+    std::string first_param;
+    std::string second_param;
+
+    (void)server;
+    if (request.find("#") == std::string::npos)
+        return (461);
+    first_param = request.substr(request.find('#'));
+    if (!this->channel.is_empty(first_param.substr(1)) && first_param.find(":") == std::string::npos)
+        return (461);
+    second_param = first_param.substr(first_param.find(":"), first_param.find('\r'));
+    first_param = first_param.substr(1, first_param.find(' ') - 1);
+    if (this->channel.is_empty(first_param) || this->channel.is_empty(second_param.substr(1)))
+        return (461);
+    second_param = second_param.substr(1, second_param.find('\r'));
+    if (server.channel_exists(first_param)) {
+        if (server.is_admin(first_param ,this->client.get_nick_name()))
+            server.get_channel(first_param).set_topic(second_param);
+        else
+            return (482);
+    }
+    else
+        return (403);
+    return (0);
 }

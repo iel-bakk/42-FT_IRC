@@ -11,6 +11,7 @@ private:
     std::vector <std::string> admins;
     std:: string password;
     std::vector <std::string>   users_list;
+    std::string topic;
 
 public:
     Channel();
@@ -27,6 +28,8 @@ public:
     bool            is_admin(std::string username);
     bool            check_join_request(std::string request);
     bool            is_empty(std::string check);
+    bool            set_topic(std::string _topic);
+    std::string     get_topic();
 };
 
 #endif

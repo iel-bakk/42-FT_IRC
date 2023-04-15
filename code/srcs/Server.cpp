@@ -326,6 +326,10 @@ bool Server:: check_ctrl_D(std:: string buffer)
     return (false);
 }
 
+Channel Server::get_channel(std::string channel_name) {
+    return (this->channels[channel_name]);
+}
+
 void    Server::add_new_channel(Channel& new_channel) {
     this->channels.insert(std::pair<std::string, Channel>(new_channel.get_channel_name(), new_channel));
 }
