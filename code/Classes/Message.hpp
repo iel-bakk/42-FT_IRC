@@ -69,7 +69,7 @@ public :
     int				parse_kick_command(std::string request, Server& server);
     int				parse_list_command(std::string request, Server& server);
     void			add_a_channel_to_list(std::string channel);
-    int				early_list_parse(std::string request, Server& server);
+    bool            check_list_param(std::string param);
 };
 
 #endif

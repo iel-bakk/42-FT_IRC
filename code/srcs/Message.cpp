@@ -218,11 +218,6 @@ int Message:: check_my_vector(std:: string request, Server& server)
         check = parse_kick_command(request, server);
         return (check);
     }
-    else if (this->command == "LIST") {
-        std::cout << "0000" << std::endl;
-        check = this->parse_list_command(request, server);
-        return (check);
-    }
     else if (this->command == "MODE") {
         //add mode code.
     }
@@ -526,14 +521,34 @@ void    Message::add_a_channel_to_list(std::string channel) {
 
 int Message::parse_list_command(std::string request, Server& server) {
     std::cout << "LIST accepted" << std::endl;
-    (void)request;
+    std::string command;
+    std::string param;
 
-    server.send_channels_list(this->socket, "", this->client.get_nick_name());
+    request = request.substr(0, request.find('\r'));
+    std::cout << "request : " << request << "." << std::endl;
+    if (request.find(" ") != std::string::npos && request.find(" ") + 1 != std::string::npos) {
+        if (request.find("#") != std::string::npos) {
+            command = request.substr(0, request.find(" "));
+            param = request.substr(request.find("#") + 1);
+            server.send_channels_list(this->socket, param, this->client.get_nick_name());
+        }
+        else if (check_list_param(request.substr(request.find(' '))))
+            server.send_channels_list(this->socket, "", this->client.get_nick_name());
+        else
+            return (461);
+    }
+    else if (strncmp("LIST", request.c_str(), 4) == 0) {
+        server.send_channels_list(this->socket, "", this->client.get_nick_name());
+    }
+    else
+        return (461);
     return (0);
 }
 
-int Message::early_list_parse(std::string request, Server& server) {
-    (void)request;
-    (void)server;
-    return (0);
+bool    Message::check_list_param(std::string param) {
+    for (unsigned long i = 0; i != param.size(); i++) {
+        if (param[i] != ' ')
+            return (false);
+    }
+    return (true);
 }

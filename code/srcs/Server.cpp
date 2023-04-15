@@ -484,4 +484,12 @@ void    Server::send_channels_list(int socket, std::string search, std::string u
             send_a_message(socket, message);
         }
     }
+    else {
+        for (it = this->channels.begin(); it != this->channels.end(); it++) {
+            if (it->second.get_channel_name().find(search) != std::string::npos) {
+                message = ":irc_server 322 " + user + " #" +  it->second.get_channel_name() + " " + std::to_string(it->second.get_users_list().size()) + "\r\n";
+                send_a_message(socket, message);
+            }
+        }
+    }
 }
