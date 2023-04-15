@@ -25,6 +25,8 @@ public:
     void    add_admin(std::string user_nick);
     void    remove_user_from_channel_list(std::string username);
     bool    is_admin(std::string username);
+    bool    check_join_request(std::string request);
+    bool    is_empty(std::string check);
 };
 
 #endif

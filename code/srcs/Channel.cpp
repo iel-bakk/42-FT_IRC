@@ -22,9 +22,9 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
     std::string pass;
 
     tab = channel.substr(channel.find(' ') + 1);
-    if (tab[0] == '#' || tab[0] == '&') {
+    if ((tab[0] == '#' || tab[0] == '&') && !is_empty(tab.substr(0, tab.find('\r') - 1))) {
         if (tab.find(' ') != std::string::npos && tab.find(' ') + 1 < tab.length() && tab[1] != ' ') {
-            pass = tab.substr(tab.find(' ') + 1);
+            pass = tab.substr(tab.find(' ') + 1, tab.find('\r') - 1);
             tab = tab.substr(1, tab.find(' ') - 1);
             msg_channel.name = tab;
             msg_channel.password = pass;
@@ -36,7 +36,7 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
             return (0);
         }
         else
-            return (403);//Used to indicate the given channel name is invalid.
+            return (461);//Used to indicate the given channel name is invalid.
     }
     return (461);
 }
@@ -80,4 +80,13 @@ bool    Channel::is_admin(std::string username) {
     if (find(this->admins.begin(), this->admins.end(), username) != this->admins.end())
         return (true);
     return (false);
+}
+
+bool    Channel::is_empty(std::string check) {
+    std::cout << "check : " << check << "." << std::endl;
+    for (unsigned long i = 0; i != check.length() ; i++) {
+        if (check[i] != ' ')
+            return (false);
+    }
+    return (true);
 }

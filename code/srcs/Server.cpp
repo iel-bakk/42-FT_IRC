@@ -199,7 +199,7 @@ int Server:: HandleError(int error_replies, int sockfd)
             num = write(sockfd, "401 ERR_NOSUCHNICK :No such nick\r\n", 34);
             break;
         case 403:
-            num = write(sockfd, "403 ERR_NOSUCHCHANNEL :No such channel\r\n", 39);
+            num = write(sockfd, "403 ERR_NOSUCHCHANNEL :No such channel\r\n", 40);
             break;
         case 404:
             num = write(sockfd, "404 ERR_CANNOTSENDTOCHAN :Cannot send to channel\r\n", 50);
