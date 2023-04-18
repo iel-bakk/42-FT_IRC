@@ -218,6 +218,9 @@ int Server:: HandleError(int error_replies, int sockfd)
             _message = "436 ERR_NICKCOLLISION " + this->file_vectors[my_place].get_my_user() +  " :Nickname collision KILL\r\n";
             num = display_message(sockfd, _message);
             break;
+        case 443:
+            num = write(sockfd, "443 ERR_USERONCHANNEL:user already on channel\r\n", 47);
+            break;
         case 451:
             num = write(sockfd, "451 ERR_NOTREGISTERED:You have not registered\r\n", 47);
             break;
@@ -342,6 +345,8 @@ bool    Server::channel_exists(std::string channel) {
 
 void    Server::add_user_to_channel(std::string user, std::string channel) {
     this->channels[channel].add_user_to_list(user);
+    if (this->channels[channel].have_an_invite(user))
+        this->channels[channel].remove_user_to_invite_qeue(user);
 }
 
 void    Server::send_channel_users_list(std::string channel_name, Message& client) {
@@ -349,9 +354,7 @@ void    Server::send_channel_users_list(std::string channel_name, Message& clien
     std::vector<std::string> list;
     std::string list_msg;
     std::string end_list_msg;
-    std::string join_msg;
 
-    join_msg = ": JOIN " + channel_name + "\r\n";
     end_list_msg = ": 366 " + client.get_client().get_nick_name() + " = " + channel_name + " :End of /NAMES list." + "\r\n";
     list_msg = ":irc_server 353 " + client.get_client().get_nick_name() + " = #" + channel_name + " :";
     list = this->channels[channel_name].get_users_list();
@@ -522,4 +525,15 @@ void    Server::send_topic_message_for_new_members(int socket, std::string chann
 void    Server::set_topic_to_channel(std::string channel, std::string topic) {
     if (channel_exists(channel))
         this->channels[channel].set_topic(topic);
+}
+
+void    Server::send_invite_message(std::string reciever, std::string sender, std::string channel) {
+    std::map<int, Message>::iterator    it;
+    std::string                         message;
+
+    message = ":" + sender + " INVITE " + reciever + " #" + channel + "\r\n";
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
+        if (it->second.get_client().get_nick_name() == reciever)
+            send_a_message(it->second.get_socket(), message);
+    }
 }

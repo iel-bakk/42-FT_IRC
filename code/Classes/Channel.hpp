@@ -8,10 +8,11 @@ class Channel
 {
 private:
     std:: string name;
-    std::vector <std::string> admins;
+    std::vector <std::string>   admins;
     std:: string password;
     std::vector <std::string>   users_list;
     std::string topic;
+    std::vector <std::string>   invited_list;
 
 public:
     Channel();
@@ -30,6 +31,9 @@ public:
     bool            is_empty(std::string check);
     void            set_topic(std::string _topic);
     std::string     get_topic();
+    void            add_user_to_invite_qeue(std::string user);
+    void            remove_user_to_invite_qeue(std::string user);
+    bool            have_an_invite(std::string user);
 };
 
 #endif

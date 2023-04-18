@@ -70,6 +70,7 @@ public :
     void			add_a_channel_to_list(std::string channel);
     bool            check_list_param(std::string param);
     int             parse_topic(std::string request, Server& server);
+    int             parse_invite_command(std::string request, Server& server);
 };
 
 #endif

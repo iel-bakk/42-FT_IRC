@@ -84,6 +84,7 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
 {
     int check = 0;
 
+    std::cout << "stoof : " << message << std::endl;
     this->message = message;
         if (strncmp("LIST", message.c_str(), 4) == 0) {
         check = parse_list_command(message, server);
@@ -216,6 +217,11 @@ int Message:: check_my_vector(std:: string request, Server& server)
         check = parse_part_command(request, server);
         return (check);
     }
+    else if (this->command == "INVITE")
+    {
+        check = parse_invite_command(request, server);
+        return (check);
+    }
     else if (this->command == "KICK")
     {
         check = parse_kick_command(request, server);
@@ -284,7 +290,7 @@ int Message:: check_Error_Space(std:: string command)
     if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos
         || command.find("JOIN") != std:: string:: npos || command.find("PART") != std:: string:: npos
         || command.find("MODE") != std:: string:: npos || command.find("KICK") != std:: string:: npos
-        || command.find("TOPIC") != std:: string:: npos)
+        || command.find("TOPIC") != std:: string:: npos || command.find("INVITE") != std:: string:: npos)
         return check = 461;
     else if (command.find("NICK") != std:: string:: npos)
         return check = 431;
@@ -405,7 +411,8 @@ bool Message:: check_command(std:: string command)
      if (command.find("PASS") != std:: string :: npos || command.find("NICK") != std:: string :: npos \
     || command.find("USER") != std:: string :: npos || command.find("PRIVMSG") != std:: string :: npos || command.find("NOTICE") != std:: string :: npos \
     || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos || command.find("MODE") != std:: string :: npos\
-    || command.find("KICK") != std:: string :: npos || command.find("LIST") != std:: string :: npos || command.find("TOPIC") != std:: string:: npos)
+    || command.find("KICK") != std:: string :: npos || command.find("LIST") != std:: string :: npos || command.find("TOPIC") != std:: string:: npos\
+    || command.find("INVITE") != std:: string:: npos)
         return false;
     return true;
 }
@@ -524,12 +531,10 @@ void    Message::add_a_channel_to_list(std::string channel) {
 }
 
 int Message::parse_list_command(std::string request, Server& server) {
-    std::cout << "LIST accepted" << std::endl;
     std::string command;
     std::string param;
 
     request = request.substr(0, request.find('\r'));
-    std::cout << "request : " << request << "." << std::endl;
     if (request.find(" ") != std::string::npos && request.find(" ") + 1 != std::string::npos) {
         if (request.find("#") != std::string::npos) {
             command = request.substr(0, request.find(" "));
@@ -581,5 +586,40 @@ int Message::parse_topic(std::string request, Server& server){
     }
     else
         return (403);
+    return (0);
+}
+
+int Message::parse_invite_command(std::string request, Server& server) {
+    std::string first;
+    std::string second;
+    std::string last;
+
+    (void)server;
+    if (request.find(' ') != std::string::npos) {
+        first = request.substr(request.find(' '));
+        if (this->channel.is_empty(first))
+            return (461);
+        first = request.substr(request.find(' ') + 1);
+        if (first.find('#') == std::string::npos)
+            return (461);
+        second = first.substr(first.find('#') + 1);
+        if (this->channel.is_empty(second))
+            return (461);
+        if (second.find(' ') != std::string::npos) {
+            last = second.substr(second.find(' '));
+            second = second.substr(0, second.find(' '));
+        }
+        if (!this->channel.is_empty(last))
+            return (461);
+        first = first.substr(0, first.find(' '));
+        if (server.channel_exists(second)) {
+            if (server.user_exist_in_channel(first, second))
+                return (443);
+            server.get_channel(second).add_user_to_invite_qeue(first);
+            server.send_invite_message(first, this->client.get_nick_name(), second);
+        }
+    }
+    else
+        return (461);
     return (0);
 }

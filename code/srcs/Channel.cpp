@@ -102,3 +102,27 @@ void        Channel::set_topic(std::string _topic) {
 std::string Channel::get_topic() {
     return (this->topic);
 }
+
+void    Channel::add_user_to_invite_qeue(std::string user) {
+    this->invited_list.push_back(user);
+}
+
+void    Channel::remove_user_to_invite_qeue(std::string user) {
+    std::vector<std::string>::iterator it;
+    size_t  index = 0;
+
+    for (it = this->invited_list.begin(); it != this->invited_list.end(); it++)
+    {
+        if (this->invited_list[index] == user) {
+            this->invited_list.erase(this->invited_list.begin() + index);
+            std::cout << "remouved ." << std::endl;
+        }
+        index++;
+    }
+}
+
+bool    Channel::have_an_invite(std::string user) {
+    if (find(this->invited_list.begin(), this->invited_list.end(), user) != this->invited_list.end())
+        return (true);
+    return (false);
+}

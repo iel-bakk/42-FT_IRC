@@ -80,6 +80,7 @@ class Server
     	void        send_topic_message(std::string channel, std::string topic);
 		void		send_topic_message_for_new_members(int socket, std::string channel);
 		void		set_topic_to_channel(std::string channel, std::string topic);
+		void		send_invite_message(std::string reciver, std::string sender, std::string channel);
 };
 
 #endif
