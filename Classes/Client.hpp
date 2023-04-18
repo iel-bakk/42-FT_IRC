@@ -25,7 +25,6 @@ public:
     int parse_nickname(std:: string vector, bool enter);
     int parse_username(std:: string vector);
     int check_parameters(std:: string parameters);
-    void erase_nickname();
 };
 
 #endif

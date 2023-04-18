@@ -53,7 +53,7 @@ int Client:: parse_nickname(std:: string vector, bool enter)
         if (this->nick_name == message)
             return 436;
    }
-   if (this->nick_name == message)
+    if (this->nick_name == message)
         return check = 432;
     else
        this->nick_name = message;
@@ -90,9 +90,9 @@ int Client:: parse_username(std:: string vector)
     }
     if (this->user_name == sentences[1])
         return (check = 462);
-    for (size_t i = 0; i != sentences[2].size() - 1; i++)
+    for (size_t i = 0; i != sentences[2].size() - 2; i++)
     {
-        if (!std:: isdigit(sentences[2][i]))
+        if (!isdigit(sentences[2][i]))
             return (10); // ??????????
     }
     this->user_name = sentences[1];
@@ -114,12 +114,7 @@ int Client:: check_parameters(std:: string parameters)
          if (parameters[i] == ' ')
              count++;
     }
-    if ((count == 5 && parameters[parameters.size() - 1] == ' ') || (count == 4 && parameters[parameters.size() - 1] != ' '))
+    if ((count == 5 && parameters[parameters.size() - 1] == ' ') || count == 4)
         return check;
     return (check = 461);
-}
-
-void Client:: erase_nickname()
-{
-    this->nick_name.erase();
 }
