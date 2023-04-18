@@ -79,6 +79,8 @@ void Server:: accept_socket(void)
     int num_fds;
     int count;
     int sock;
+    int num;
+    int check;
     std:: vector<std:: string> new_user;
 
     size = sizeof(this->socker_addr);
@@ -126,6 +128,24 @@ void Server:: accept_socket(void)
                     sock = this->fds[i].fd;
                     my_place = i - 1;
                     read_write_socket(sock, &num_fds, &this->file_vectors[my_place]);
+                    if (my_place != 0)
+                    {
+                        if (this->file_vectors[my_place].get_my_user().size() != 0)
+                        {
+                                for (int i= 0; i != my_place; i++)
+                                {
+                                    if (this->file_vectors[i].get_my_user() == this->file_vectors[my_place].get_my_user())
+                                    {
+                                        std:: string _message = "436 ERR_NICKCOLLISION " + this->file_vectors[my_place].get_my_user() +  " :Nickname collision KILL\r\n";
+                                        num = display_message(this->file_vectors[my_place].get_socket(), _message);
+                                        this->file_vectors[my_place].erase_user();
+                                    }
+                                    check = HandleError(this->file_vectors[my_place].send_Message_identification(), this->file_vectors[my_place].get_socket());
+                                }
+                        }
+                    }
+                    else
+                            check = HandleError(this->file_vectors[my_place].send_Message_identification(), this->file_vectors[my_place].get_socket());
                 }
             }
         }
@@ -181,13 +201,13 @@ int Server:: HandleError(int error_replies, int sockfd)
     switch (error_replies)
     {
         case 10:
-            std:: cout << "Not Numeric" << std:: endl; // ???????
+            std:: cout << "Not Numeric" << std:: endl;
             break;
         case 11:
             close_socket(this->file_vectors[my_place].get_socket());
             break;
         case 12:
-            std:: cout << "Invalid Command" << std:: endl; // ???????
+            std:: cout << "Invalid Command" << std:: endl;
             break;
         case 13:
             num = write_long_message(sockfd);
