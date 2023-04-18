@@ -84,7 +84,6 @@ int Message:: parse_message(std:: string password, std:: string message)
 {
     int check = 0;
 
-    // std::cout << "message : " << message << std::endl << "pass : " << std::endl;
     this->message = message;
     if (this->message[0] == ':')
     {
@@ -106,7 +105,7 @@ int Message:: parse_message(std:: string password, std:: string message)
         check = check_Error_Space(this->command);
         return (check);
     }
-    if (this->message.find(' ') != std:: string:: npos)
+    if (this->message.find(' ') != std:: string:: npos )
         this->message = handle_space(this->message, this->command);
     check = check_Password_Space(this->params.size(), this->command, this->message, password);
     if (check_upper(this->command))
@@ -136,11 +135,10 @@ int Message:: parse_message(std:: string password, std:: string message)
 int Message:: check_my_vector(std:: string request)
 {
    int check;
+
     check = 0;
     if (this->command == "NICK")
     {
-        if (this->message.empty())
-            return (461);
         check = client.parse_nickname(request, this->enter);
         this->my_user = client.get_nick_name();
         if (check != 0)
@@ -150,8 +148,11 @@ int Message:: check_my_vector(std:: string request)
     else if (this->command == "USER")
         check = client.parse_username(request);
     else if (this->command == "JOIN")
-    {   
-        check = channel.parse_channel(request);
+    {
+        if (client.get_nick_name().size() != 0 && client.get_user_name().size() != 0)
+            check = channel.parse_channel(request);
+        else
+            return check = 451;
     }
     else if (this->command == "PRIVMSG")
     {
@@ -173,7 +174,6 @@ int Message:: check_my_vector(std:: string request)
         else
             check = 451;
     }
-   check = send_Message_identification(check);
    return (check);
 }
 
@@ -250,23 +250,25 @@ int Message:: check_message(std:: string command)
     return (check);
 }
 
-int Message:: send_Message_identification(int check)
+int Message:: send_Message_identification()
 {
     std:: string message;
+    int check;
     char hostname[256];
     char time_str[11];
     std:: time_t    now = std::time(NULL);
     std:: tm    *local_time = std:: localtime(&now);
 
+    check = 0;
     std::strftime(time_str, sizeof(time_str), "%d/%m/%Y", local_time);
     gethostname(hostname, sizeof(hostname));
     if (client.get_nick_name().size() != 0 && client.get_user_name().size() != 0 && this->enter == false)
     {
-        this->welcome_message = ": 001 " + client.get_nick_name() + " Welcome to Internet Chat Relay";
-        this->host_message = ": 002 " + client.get_nick_name() + " Your Host is " + std:: string(hostname) + ", running version 1.0";
-        this->server_message = ": 003 " + client.get_nick_name() + " Ther server was created on " + std:: string(time_str);
+        this->welcome_message = ":irc 001 " + client.get_nick_name() + " Welcome to Internet Chat Relay";
+        this->host_message = ":irc 002 " + client.get_nick_name() + " Your Host is " + std:: string(hostname) + ", running version 1.0";
+        this->server_message = ":irc 003 " + client.get_nick_name() + " Ther server was created on " + std:: string(time_str);
         this->enter = true;
-        return (check = 13);
+        return (13);
     }
     return (check);
 }
@@ -352,6 +354,12 @@ bool Message:: check_command(std:: string command)
     || command.find("JOIN") != std:: string :: npos)
         return false;
     return true;
+}
+
+void Message:: erase_user(void)
+{
+    this->my_user.erase();
+    client.erase_nickname();
 }
 
 std:: vector<std:: string> Message:: create_vector(void)
