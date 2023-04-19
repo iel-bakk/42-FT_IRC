@@ -84,8 +84,13 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
 {
     int check = 0;
 
-    std::cout << message << std::endl;
+    std::cout << "stoof : " << message << std::endl;
     this->message = message;
+        if (strncmp("LIST", message.c_str(), 4) == 0) {
+        check = parse_list_command(message, server);
+    }
+    else {
+
     if (this->message[0] == ':')
     {
         size_t prefix_end = this->message.find(' ');
@@ -130,6 +135,7 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
     check = check_my_vector(this->params.back(), server);
     if (check != 0 && check != 13 && check != 14)
         this->params.erase(this->params.end() - 1);
+    }
     return (check);
 }
 
@@ -138,6 +144,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
    int check;
     check = 0;
 
+    std::cout << "cmd: " << this->command << std::endl;
     if (this->command == "NICK")
     {
         if (this->message.empty())
@@ -150,8 +157,10 @@ int Message:: check_my_vector(std:: string request, Server& server)
     }
     else if (this->command == "USER")
         check = client.parse_username(request);
+    else if (this->command == "TOPIC")
+        check = parse_topic(request, server);
     else if (this->command == "JOIN")
-    {   
+    {
         check = channel.parse_channel(request, this->channel);
         if (check == 0){
             if (!server.channel_exists(this->channel.get_channel_name())) {
@@ -163,14 +172,18 @@ int Message:: check_my_vector(std:: string request, Server& server)
             }
             else {
                 if (this->channel.get_channel_password() == server.get_channel_password(this->channel.get_channel_name())) {
+                if (server.user_exist_in_channel(this->client.get_nick_name(), this->channel.get_channel_name()))
+                    return (462);
                     server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
                     server.send_join_message(this->client.get_nick_name(), this->channel.get_channel_name());
                     server.send_channel_users_list(this->channel.get_channel_name(), *this);
+                    server.send_topic_message_for_new_members(this->socket, this->channel.get_channel_name());
                 }
                 else {
                     check = 464;
                 }
             }
+            this->add_a_channel_to_list(this->channel.get_channel_name());
             this->channel.empty_channel();
         }
     }
@@ -202,6 +215,16 @@ int Message:: check_my_vector(std:: string request, Server& server)
     else if (this->command == "PART")
     {
         check = parse_part_command(request, server);
+        return (check);
+    }
+    else if (this->command == "INVITE")
+    {
+        check = parse_invite_command(request, server);
+        return (check);
+    }
+    else if (this->command == "KICK")
+    {
+        check = parse_kick_command(request, server);
         return (check);
     }
     else if (this->command == "MODE") {
@@ -266,7 +289,8 @@ int Message:: check_Error_Space(std:: string command)
     check = 0;
     if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos
         || command.find("JOIN") != std:: string:: npos || command.find("PART") != std:: string:: npos
-        || command.find("MODE") != std:: string:: npos)
+        || command.find("MODE") != std:: string:: npos || command.find("KICK") != std:: string:: npos
+        || command.find("TOPIC") != std:: string:: npos || command.find("INVITE") != std:: string:: npos)
         return check = 461;
     else if (command.find("NICK") != std:: string:: npos)
         return check = 431;
@@ -386,7 +410,9 @@ bool Message:: check_command(std:: string command)
 {
      if (command.find("PASS") != std:: string :: npos || command.find("NICK") != std:: string :: npos \
     || command.find("USER") != std:: string :: npos || command.find("PRIVMSG") != std:: string :: npos || command.find("NOTICE") != std:: string :: npos \
-    || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos || command.find("MODE") != std:: string :: npos)
+    || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos || command.find("MODE") != std:: string :: npos\
+    || command.find("KICK") != std:: string :: npos || command.find("LIST") != std:: string :: npos || command.find("TOPIC") != std:: string:: npos\
+    || command.find("INVITE") != std:: string:: npos)
         return false;
     return true;
 }
@@ -432,6 +458,7 @@ int Message::parse_part_command(std::string request, Server& server) {
     if (channel_name.find(':') != std::string::npos) {
         message = channel_name.substr(channel_name.find(':') + 1);
         channel_name = channel_name.substr(1, channel_name.find(' ') - 1);
+        std::cout << "." << channel_name << "." << std::endl;
     }
     else {
         channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find('\r') - 1);        
@@ -441,6 +468,158 @@ int Message::parse_part_command(std::string request, Server& server) {
         server.remove_user_from_channel(this->client.get_nick_name(), channel_name);
     }
     else
-        std::cout << "NO" <<std::endl;
+        return (403);
+    return (0);
+}
+
+int Message::parse_kick_command(std::string request, Server& server) {
+    std::string channel_name;
+    std::string kicked_user;
+    std::string reason;
+
+    if (request.find('#') != std::string::npos) {
+        channel_name = request.substr(request.find('#') + 1);
+        if (channel_name.find(' ') != std::string::npos) {
+            kicked_user = channel_name.substr(channel_name.find(' ') + 1);
+            if (kicked_user.find(':') != std::string::npos) {
+                reason = kicked_user.substr(kicked_user.find(":") + 1);
+                channel_name = channel_name.substr(0, channel_name.find(' '));
+                kicked_user = kicked_user.substr(0,kicked_user.find(' '));
+                if (server.channel_exists(channel_name)) {
+                    if (server.user_exist_in_channel(kicked_user, channel_name) && server.user_exist_in_channel(this->client.get_nick_name(), channel_name)) {
+                        if (server.is_admin(channel_name, this->client.get_nick_name())) {
+                            server.send_kick_message_to_channel(channel_name, kicked_user, reason, this->client.get_nick_name());
+                            server.remove_user_from_channel(kicked_user, channel_name);
+                        }
+                        else
+                            return (482);
+                    }
+                    else
+                        return (401);
+                }
+                else
+                    return (403);
+            }
+            else {
+                channel_name = channel_name.substr(0, channel_name.find(' '));
+                if (server.channel_exists(channel_name)) {
+                    if (server.user_exist_in_channel(kicked_user, channel_name) && server.user_exist_in_channel(this->client.get_nick_name(), channel_name)) {
+                        if (server.is_admin(channel_name, this->client.get_nick_name())) {
+                            server.send_kick_message_to_channel(channel_name, kicked_user, "", this->client.get_nick_name());
+                            server.remove_user_from_channel(kicked_user, channel_name);
+                        }
+                        else
+                            return (482);
+                    }
+                    else
+                        return (401);
+                }
+                else
+                    return (403);
+            }
+        }
+        else
+            return (461);
+    }
+    else
+        return (461);
+    return (0);
+}
+
+void    Message::add_a_channel_to_list(std::string channel) {
+    this->joined_channels.push_back(channel);
+}
+
+int Message::parse_list_command(std::string request, Server& server) {
+    std::string command;
+    std::string param;
+
+    request = request.substr(0, request.find('\r'));
+    if (request.find(" ") != std::string::npos && request.find(" ") + 1 != std::string::npos) {
+        if (request.find("#") != std::string::npos) {
+            command = request.substr(0, request.find(" "));
+            param = request.substr(request.find("#") + 1);
+            server.send_channels_list(this->socket, param, this->client.get_nick_name());
+        }
+        else if (check_list_param(request.substr(request.find(' '))))
+            server.send_channels_list(this->socket, "", this->client.get_nick_name());
+        else
+            return (461);
+    }
+    else if (strncmp("LIST", request.c_str(), 4) == 0) {
+        server.send_channels_list(this->socket, "", this->client.get_nick_name());
+    }
+    else
+        return (461);
+    return (0);
+}
+
+bool    Message::check_list_param(std::string param) {
+    for (unsigned long i = 0; i != param.size(); i++) {
+        if (param[i] != ' ')
+            return (false);
+    }
+    return (true);
+}
+
+int Message::parse_topic(std::string request, Server& server){
+    std::string first_param;
+    std::string second_param;
+
+    if (request.find("#") == std::string::npos)
+        return (461);
+    first_param = request.substr(request.find('#'));
+    if (!this->channel.is_empty(first_param.substr(1)) && first_param.find(":") == std::string::npos)
+        return (461);
+    second_param = first_param.substr(first_param.find(":"), first_param.find('\r'));
+    first_param = first_param.substr(1, first_param.find(' ') - 1);
+    if (this->channel.is_empty(first_param) || this->channel.is_empty(second_param.substr(1)))
+        return (461);
+    second_param = second_param.substr(1, second_param.find('\r'));
+    if (server.channel_exists(first_param)) {
+        if (server.is_admin(first_param ,this->client.get_nick_name())) {
+            server.send_topic_message(first_param, second_param);
+            server.set_topic_to_channel(first_param, second_param);
+        }
+        else
+            return (482);
+    }
+    else
+        return (403);
+    return (0);
+}
+
+int Message::parse_invite_command(std::string request, Server& server) {
+    std::string first;
+    std::string second;
+    std::string last;
+
+    (void)server;
+    if (request.find(' ') != std::string::npos) {
+        first = request.substr(request.find(' '));
+        if (this->channel.is_empty(first))
+            return (461);
+        first = request.substr(request.find(' ') + 1);
+        if (first.find('#') == std::string::npos)
+            return (461);
+        second = first.substr(first.find('#') + 1);
+        if (this->channel.is_empty(second))
+            return (461);
+        if (second.find(' ') != std::string::npos) {
+            last = second.substr(second.find(' '));
+            second = second.substr(0, second.find(' '));
+        }
+        if (!this->channel.is_empty(last))
+            return (461);
+        first = first.substr(0, first.find(' '));
+        if (server.channel_exists(second)) {
+            if (server.user_exist_in_channel(first, second))
+                return (443);
+            server.get_channel(second).add_user_to_invite_qeue(first);
+            server.send_invite_message(first, this->client.get_nick_name(), second);
+        }
+    }
+    else
+        return (461);
     return (0);
 }
