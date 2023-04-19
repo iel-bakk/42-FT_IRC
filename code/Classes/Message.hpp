@@ -66,7 +66,8 @@ public:
     Client  get_client();
     int parse_part_command(std::string request, Server& server);
     int parse_Mode_command(std::string request, Server& server);
-    // void add_mode_to_channel(std::string,std::string,std::string);
+    void check_mode (std::string mode, std::string channel_name,Server& server);
+    void add_mode_to_channel(std::string,std::string,std::string);
     // void remove_mode_from_channel(std::string,std::string,std::string);
     // void set_channel_modes(Channel &ch);
 };
