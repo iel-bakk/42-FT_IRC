@@ -3,6 +3,7 @@
 
 #include <iostream>
 # include <vector>
+# include <map>
 
 class Channel
 {
@@ -10,8 +11,8 @@ private:
     std:: string name;
     std::vector <std::string> admins;
     std:: string password;
-    std::vector <std::string>   users_list;
-    std::map<std::string, bool> channel_modes;
+    std::vector <std::string>   users_list ;
+    std::map<std::string, bool> channel_modes ;
 
 public:
     Channel();

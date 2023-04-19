@@ -205,7 +205,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
         return (check);
     }
     else if (this->command == "MODE") {
-        parse_Mode_command(request, server);
+      check =  parse_Mode_command(request, server);
     }
    check = send_Message_identification(check);
    return (check);
@@ -384,7 +384,7 @@ bool Message:: check_command(std:: string command)
 {
      if (command.find("PASS") != std:: string :: npos || command.find("NICK") != std:: string :: npos \
     || command.find("USER") != std:: string :: npos || command.find("PRIVMSG") != std:: string :: npos || command.find("NOTICE") != std:: string :: npos \
-    || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos)
+    || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos || command.find("MODE") != std:: string :: npos)
         return false;
     return true;
 }
@@ -448,7 +448,6 @@ int Message::parse_Mode_command(std::string request, Server& server)
     std::string channel_name;
     std::string mode;
     std::string param;
-
     if (request.find('+') == std::string::npos && request.find('-') == std::string::npos)
         return (461);
     if (request.find(' ') != std::string::npos && request.find(' ') + 1 != std::string::npos)// find #
@@ -463,9 +462,9 @@ int Message::parse_Mode_command(std::string request, Server& server)
                 mode = mode.substr(1, mode.find(' '));
                 channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find(' '));
                 if(mode[0] == '+')
-                    add_mode_to_channel(mode, channel_name ,param);
+                    add_mode_to_channel(mode, channel_name ,param,server);
                 else if(mode[0] == '-')
-                    remove_mode_from_channel(mode, channel_name,param);
+                    remove_mode_from_channel(mode, channel_name,param,server);
                 else 
                      return (461); 
                 return (0);
@@ -475,9 +474,9 @@ int Message::parse_Mode_command(std::string request, Server& server)
                 mode = mode.substr(1, mode.find(' '));
                 channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find(' '));
                  if(mode[0] == '+')
-                    add_mode_to_channel(mode, channel_name , NULL);
+                    add_mode_to_channel(mode, channel_name , NULL,server);
                 else if(mode[0] == '-')
-                    remove_mode_from_channel(mode, channel_name,NULL);
+                    remove_mode_from_channel(mode, channel_name,NULL,server);
                 else 
                      return (461); 
                 return (0);
@@ -489,8 +488,18 @@ int Message::parse_Mode_command(std::string request, Server& server)
     return (461); 
 }
 
-
-void Message::add_mode_to_channel(std::string mode, std::string channel_name, std::string params)
+void Message::check_mode (std::string mode, std::string channel_name,Server &server)
 {
+    if (server.channel_exists(channel_name) && server.user_exist_in_channel(channel_name,this->client.get_nick_name()))
+    {
+        
+    }
+}
+
+
+void Message::add_mode_to_channel(std::string mode, std::string channel_name, std::string params,Server &server)
+{
+    if (!check_mode (mode, channel_name,server));
+        return (std::cout << "Unrecognized mode received: " << mode ,0);
     
 }

@@ -86,3 +86,12 @@ bool    Channel::is_admin(std::string username) {
         return (true);
     return (false);
 }
+
+void Channel::set_channels_modes()
+{
+    channel_modes.insert (std::make_pair ("i",0));
+    channel_modes.insert (std::make_pair ("k",0));
+    channel_modes.insert (std::make_pair ("m",0));
+    channel_modes.insert (std::make_pair("p",0));
+    channel_modes.insert (std::make_pair("p",0));
+}
