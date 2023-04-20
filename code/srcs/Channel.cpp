@@ -133,9 +133,24 @@ bool    Channel::have_an_invite(std::string user) {
 }
 void Channel::set_channels_modes()
 {
-    channel_modes.insert (std::make_pair ("i",0));
-    channel_modes.insert (std::make_pair ("k",0));
-    channel_modes.insert (std::make_pair ("m",0));
-    channel_modes.insert (std::make_pair("p",0));
-    channel_modes.insert (std::make_pair("p",0));
+    channel_modes.insert (std::make_pair ('i',0));
+    channel_modes.insert (std::make_pair ('k',0));
+    channel_modes.insert (std::make_pair ('m',0));
+    channel_modes.insert (std::make_pair('p',0));
+    channel_modes.insert (std::make_pair('t',0));
+
+}
+
+int Channel::find_modes (char c)
+{
+    std::map<char, bool>::iterator it;
+    for (it = channel_modes.begin(); it != channel_modes.end(); it++)
+    {
+        if (it->first == 'c')
+        {
+            it->second = true;
+            return (0);
+        }
+    }
+    return (472);
 }

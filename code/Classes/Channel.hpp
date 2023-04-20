@@ -15,8 +15,7 @@ private:
     std::vector <std::string>   users_list;
     std::string topic;
     std::vector <std::string>   invited_list;
-    std::vector <std::string>   users_list ;
-    std::map<std::string, bool> channel_modes ;
+    std::map<char, bool> channel_modes ;
 
 public:
     Channel();
@@ -50,6 +49,7 @@ public:
     void    remove_user_from_channel_list(std::string username);
     void set_channels_modes();
     bool    is_admin(std::string username);
+    int find_modes(char c);
     
 };
 

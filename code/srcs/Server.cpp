@@ -233,6 +233,8 @@ int Server:: HandleError(int error_replies, int sockfd)
         case 462:
             num = write(sockfd, "462 ERR_ALREADYREGISTRED USER :Unauthorized command (already registered)\r\n", 74);
             break;
+        case 472:
+            num = write(sockfd, "472 ERR_UNKNOWNMODE :is unknown mode char to me for this channel\r\n",66);
         case 482:
             num = write(sockfd, "482 ERR_CHANOPRIVSNEEDED You're not channel operator\r\n", 54);
             break;

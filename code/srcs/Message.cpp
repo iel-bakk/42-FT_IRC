@@ -671,18 +671,27 @@ int Message::parse_Mode_command(std::string request, Server& server)
     return (461); 
 }
 
-void Message::check_mode (std::string mode, std::string channel_name,Server &server)
+
+int Message::check_mode (std::string mode, std::string channel_name,Server &server)
 {
+    int i = 1;
+
     if (server.channel_exists(channel_name) && server.user_exist_in_channel(channel_name,this->client.get_nick_name()))
     {
-        
+        while (i < mode.length())
+        {
+            server.get_channel(channel_name).find_modes(mode[i]);
+            i++;
+        }
     }
+    else
+        return (472);
 }
 
 
 void Message::add_mode_to_channel(std::string mode, std::string channel_name, std::string params,Server &server)
 {
     if (!check_mode (mode, channel_name,server));
-        return (std::cout << "Unrecognized mode received: " << mode ,0);
+        return (472);
     
 }
