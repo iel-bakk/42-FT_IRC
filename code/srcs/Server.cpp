@@ -117,6 +117,7 @@ void Server:: accept_socket(void)
                         this->fds[num_fds].events = POLLIN;
                         num_fds++;
                         Message my_message(this->new_socket_fd);
+                        my_message.set_time();
                         this->file_vectors[count] = my_message;
                         count++;
                     }
@@ -536,4 +537,13 @@ void    Server::send_invite_message(std::string reciever, std::string sender, st
         if (it->second.get_client().get_nick_name() == reciever)
             send_a_message(it->second.get_socket(), message);
     }
+}
+
+void    Server::print_current_time(int  socket){
+    time_t tmn = time(NULL);
+    tm* local_time = localtime(&tmn);
+    std::string message;
+
+    message = ": TIME : " + std::to_string(local_time->tm_hour) + ":" + std::to_string(local_time->tm_min) + ":" + std::to_string(local_time->tm_sec) + "\r\n";
+    send_a_message(socket, message);
 }

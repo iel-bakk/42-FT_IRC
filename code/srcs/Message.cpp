@@ -217,6 +217,11 @@ int Message:: check_my_vector(std:: string request, Server& server)
         check = parse_part_command(request, server);
         return (check);
     }
+    else if (this->command == "BOT")
+    {
+        check = parse_bot_command(request, server);
+        return (check);
+    }
     else if (this->command == "INVITE")
     {
         check = parse_invite_command(request, server);
@@ -290,7 +295,8 @@ int Message:: check_Error_Space(std:: string command)
     if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos
         || command.find("JOIN") != std:: string:: npos || command.find("PART") != std:: string:: npos
         || command.find("MODE") != std:: string:: npos || command.find("KICK") != std:: string:: npos
-        || command.find("TOPIC") != std:: string:: npos || command.find("INVITE") != std:: string:: npos)
+        || command.find("TOPIC") != std:: string:: npos || command.find("INVITE") != std:: string:: npos
+        || command.find("BOT") != std:: string:: npos)
         return check = 461;
     else if (command.find("NICK") != std:: string:: npos)
         return check = 431;
@@ -412,7 +418,7 @@ bool Message:: check_command(std:: string command)
     || command.find("USER") != std:: string :: npos || command.find("PRIVMSG") != std:: string :: npos || command.find("NOTICE") != std:: string :: npos \
     || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos || command.find("MODE") != std:: string :: npos\
     || command.find("KICK") != std:: string :: npos || command.find("LIST") != std:: string :: npos || command.find("TOPIC") != std:: string:: npos\
-    || command.find("INVITE") != std:: string:: npos)
+    || command.find("INVITE") != std:: string:: npos || command.find("BOT") != std:: string:: npos)
         return false;
     return true;
 }
@@ -622,4 +628,38 @@ int Message::parse_invite_command(std::string request, Server& server) {
     else
         return (461);
     return (0);
+}
+
+int Message::parse_bot_command(std::string request, Server& server) {
+    std::string param;
+    if (request.find(' ') != std::string::npos) {
+        param = request.substr(request.find(' ') + 1);
+        if (!this->channel.is_empty(param)) {
+            param = param.substr(0, param.find('\r'));
+            if (param == "TIME")
+                server.print_current_time(this->get_socket());
+            else if (param == "LOGTIME")
+                server.send_a_message(this->get_socket(), this->get_logtime());
+            else
+                return (461);
+        }
+        else
+            return (461);
+    }
+    return (0);
+}
+
+void    Message::set_time() {
+    this->_time = std::time(NULL);
+}
+
+std::string    Message::get_logtime() {
+    std::string log;
+    double      seconds;
+    std::time_t      local_time;
+
+    local_time = std::time(nullptr);
+    seconds = difftime(local_time, this->_time);
+    log = ": logtime : " + std::to_string(static_cast<int>(seconds / 60)) + " min, " + std::to_string(static_cast<int>(((seconds / 60) - static_cast<int>(seconds / 60)) * 60)) + " sec.\r\n";
+    return (log);
 }
