@@ -544,6 +544,6 @@ void    Server::print_current_time(int  socket){
     tm* local_time = localtime(&tmn);
     std::string message;
 
-    message = ": TIME : " + std::to_string(local_time->tm_hour) + ":" + std::to_string(local_time->tm_min) + ":" + std::to_string(local_time->tm_sec) + "\r\n";
+    message = ":BOT NOTICE TIME : " + std::to_string(local_time->tm_hour) + ":" + std::to_string(local_time->tm_min) + ":" + std::to_string(local_time->tm_sec) + "\r\n";
     send_a_message(socket, message);
 }

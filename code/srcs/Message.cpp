@@ -660,6 +660,6 @@ std::string    Message::get_logtime() {
 
     local_time = std::time(nullptr);
     seconds = difftime(local_time, this->_time);
-    log = ": logtime : " + std::to_string(static_cast<int>(seconds / 60)) + " min, " + std::to_string(static_cast<int>(((seconds / 60) - static_cast<int>(seconds / 60)) * 60)) + " sec.\r\n";
+    log = ":BOT NOTICE logtime : " + std::to_string(static_cast<int>(seconds / 60)) + " min, " + std::to_string(static_cast<int>(((seconds / 60) - static_cast<int>(seconds / 60)) * 60)) + " sec.\r\n";
     return (log);
 }
