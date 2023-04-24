@@ -292,10 +292,12 @@ int Message:: check_Error_Space(std:: string command)
         || command.find("JOIN") != std:: string:: npos || command.find("PART") != std:: string:: npos
         || command.find("MODE") != std:: string:: npos || command.find("KICK") != std:: string:: npos
         || command.find("TOPIC") != std:: string:: npos || command.find("INVITE") != std:: string:: npos)
-    if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos || command.find("JOIN") != std:: string:: npos)
-        return check = 461;
+        {
+            if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos || command.find("JOIN") != std:: string:: npos)
+                check = 461;
+        }
     else if (command.find("NICK") != std:: string:: npos)
-        return check = 431;
+        check = 431;
     return (check);
 }
 
@@ -626,72 +628,96 @@ int Message::parse_invite_command(std::string request, Server& server) {
     return (0);
 }
 
-int Message::parse_Mode_command(std::string request, Server& server)
+int Message::parse_Mode_command(std::string request,Server& server)
 {
     std::string channel_name;
     std::string mode;
-    std::string param;
+    std::string param = NULL;
     if (request.find('+') == std::string::npos && request.find('-') == std::string::npos)
         return (461);
+    if (request.find('+') != std::string::npos && request.find('-') != std::string::npos)
+        return (472);
     if (request.find(' ') != std::string::npos && request.find(' ') + 1 != std::string::npos)// find #
     {
-        if (channel_name.find(' ') != std::string::npos)
-        {
-            channel_name = request.substr(request.find(' ') + 1);
-            mode = channel_name.substr(channel_name.find(' ') + 1);
-            if (mode.find(' ') != std::string::npos)
-            {
-                param = mode.substr(mode.find(' ') + 1);
-                mode = mode.substr(1, mode.find(' '));
-                channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find(' '));
-                if(mode[0] == '+')
-                    add_mode_to_channel(mode, channel_name ,param,server);
-                else if(mode[0] == '-')
-                    remove_mode_from_channel(mode, channel_name,param,server);
-                else 
-                     return (461); 
-                return (0);
-            }
-            else
-            {
-                mode = mode.substr(1, mode.find(' '));
-                channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find(' '));
-                 if(mode[0] == '+')
-                    add_mode_to_channel(mode, channel_name , NULL,server);
-                else if(mode[0] == '-')
-                    remove_mode_from_channel(mode, channel_name,NULL,server);
-                else 
-                     return (461); 
-                return (0);
-            }
+
+        channel_name = request.substr(request.find('#') + 1, request.find(' ', request.find('#')) - request.find('#') - 1);
+
+        if (request.find('+') != std::string::npos)
+            mode = request.substr(request.find('+'));
+        else if (request.find('-') != std::string::npos)
+            mode  = request.substr(request.find('-'));
+        if (mode.find(' ') != std::string::npos && mode.find(' ') + 1 != std::string::npos)
+        {   
+            param = mode.substr(mode.find(' ') + 1);
+            mode  = mode.substr(0, mode.find(' '));
+            std::cout << "mode " << mode << std::endl;
+            std::cout << "channel " << channel_name << std::endl;
+            std::cout << "param " << param << std::endl;
+            if(mode[0] == '+')
+                add_mode_to_channel(mode, channel_name,param, server);
+            else if(mode[0] == '-')
+                remove_mode_from_channel(mode, channel_name,param, server);
+            else 
+                return (461); 
         }
-        else
-            return (461);
+        if(mode[0] == '+')
+            add_mode_to_channel(mode, channel_name, NULL,server);
+        else if(mode[0] == '-')
+            remove_mode_from_channel(mode, channel_name,NULL, server);
+        else 
+            return (461); 
     }
     return (461); 
 }
 
 
+
 int Message::check_mode (std::string mode, std::string channel_name,Server &server)
 {
-    int i = 1;
+    size_t i = 1;
 
     if (server.channel_exists(channel_name) && server.user_exist_in_channel(channel_name,this->client.get_nick_name()))
     {
         while (i < mode.length())
         {
-            server.get_channel(channel_name).find_modes(mode[i]);
-            i++;
+            if (server.get_channel(channel_name).find_modes(mode[i]))
+                i++;
         }
+        return (1);
     }
     else
-        return (472);
+        return (0);
 }
 
 
-void Message::add_mode_to_channel(std::string mode, std::string channel_name, std::string params,Server &server)
+int Message::add_mode_to_channel(std::string mode, std::string channel_name,std::string param,Server &server)
 {
-    if (!check_mode (mode, channel_name,server));
+    (void)param;
+    size_t i = 0;
+    while (mode[i] == '+')
+        i++;
+    if (i < mode.length())
+        mode = mode.substr(i + 1);
+    else
         return (472);
-    
+    if (!check_mode (mode, channel_name,server))
+        return (472);
+    server.get_channel (channel_name).set_modes(mode);
+    return (1);
+}
+
+int Message::remove_mode_from_channel(std::string mode, std::string channel_name,std::string param,Server& server)
+{
+    (void)param;
+        size_t i = 0;
+    while (mode[i] == '-')
+        i++;
+    if (i < mode.length())
+        mode = mode.substr(i + 1);
+    else
+        return (472);
+     if (!check_mode (mode, channel_name,server))
+        return (472);
+    server.get_channel (channel_name).unset_modes(mode);
+    return (1);
 }

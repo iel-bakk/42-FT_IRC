@@ -37,19 +37,10 @@ public:
     void            add_user_to_invite_qeue(std::string user);
     void            remove_user_to_invite_qeue(std::string user);
     bool            have_an_invite(std::string user);
-    int parse_channel(std:: string channel, Channel& msg_channel);
-    std::string get_channel_name();
-    std::string get_channel_password();
-    std::string get_mode();
-    void    add_user_to_list(std::string user_nick);
-    void    print_users_list();
-    std::vector <std::string> get_users_list();
-    void    empty_channel();
-    void    add_admin(std::string user_nick);
-    void    remove_user_from_channel_list(std::string username);
-    void set_channels_modes();
-    bool    is_admin(std::string username);
-    int find_modes(char c);
+    void            set_channels_modes();
+    int             find_modes(char c);
+    void            set_modes(std::string);
+    void            unset_modes(std::string);
     
 };
 

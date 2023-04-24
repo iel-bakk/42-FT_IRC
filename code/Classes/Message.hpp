@@ -72,38 +72,10 @@ public :
     int             parse_topic(std::string request, Server& server);
     int             parse_invite_command(std::string request, Server& server);
 
-    std:: string get_message(void);
-    std:: string get_welcome_message(void);
-    std:: string get_host_message(void);
-    std:: string get_server_message(void);
-    std:: string get_command(void);
-    std:: string get_my_user(void);
-    std:: string get_user_to_send(void);
-    std:: string get_message_to_send(void);
-    std:: string get_password(void);
-    std:: string get_notice_private(void);
-    int get_socket(void);
-    void set_message(std:: string message);
-    std:: string handle_space(std:: string message, std:: string command);
-    int parse_message(std:: string password, std:: string message, Server& server);
-    int check_upper(std:: string command);
-    int check_my_vector(std:: string request, Server& server);
-    int check_Error_Space(std:: string command);
-    int send_Message_identification(int check);
-    int check_Password_Space(int size, std:: string command, std:: string message, std:: string password);
-    int parse_private_message(std:: string message);
-    std:: vector<std:: string> create_vector(void);
-    bool check_command(std:: string command);
-    int check_message(std:: string message);
-    void add_new_channel();
-    int parse_channel_message(std::string request, Server& server);
-    Client  get_client();
-    int parse_part_command(std::string request, Server& server);
     int parse_Mode_command(std::string request, Server& server);
     int check_mode (std::string mode, std::string channel_name,Server& server);
-    void add_mode_to_channel(std::string,std::string,std::string,Server&);
-    void remove_mode_from_channel(std::string,std::string,std::string,Server&);
-    void set_channel_modes(Channel &ch);
+    int add_mode_to_channel(std::string,std::string,std::string,Server&);
+    int remove_mode_from_channel(std::string,std::string,std::string,Server&);
 };
 
 #endif

@@ -146,11 +146,63 @@ int Channel::find_modes (char c)
     std::map<char, bool>::iterator it;
     for (it = channel_modes.begin(); it != channel_modes.end(); it++)
     {
-        if (it->first == 'c')
-        {
-            it->second = true;
-            return (0);
-        }
+        if (it->first == c)
+            return (1);
     }
-    return (472);
+    return (0);
+}
+
+void Channel::set_modes(std::string modes)
+{
+    std::map<char, bool>::iterator it;
+    size_t i = 0;
+    // std::cout << param << std::endl;
+    while (i < modes.length())
+    {
+        // if (modes[i] == 'o')
+        //     if (param.empty())
+        //         return ;
+        if (find_modes(modes[i]))
+        {
+            for (it = channel_modes.begin(); it != channel_modes.end(); it++)
+            {
+                if (it->first == mode[i])
+                {
+                    if (it->second == true)
+                        std::cout << "this mode is alredy set" << std::endl;
+                    else if (it->second == false)
+                        it->second = true;
+                }
+
+            }
+   
+        }
+        i++;
+    }
+}
+
+void Channel::unset_modes(std::string modes)
+{
+    std::map<char, bool>::iterator it;
+    size_t i = 1;
+    while (i < modes.length())
+    {
+        // if (modes[i] == 'o')
+        //     if (param.empty())
+        //         return ;
+        if (find_modes(modes[i]))
+        {
+            for (it = channel_modes.begin(); it != channel_modes.end(); it++)
+            {
+                if (it->first == modes[i])
+                {
+                    if (it->second == false)
+                        std::cout << "this mode is alredy unset" << std::endl;
+                    else if (it->second == true)
+                        it->second = false;
+                }
+            }
+        }
+        i++;
+    }
 }
