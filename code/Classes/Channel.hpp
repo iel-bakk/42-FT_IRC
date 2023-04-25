@@ -41,6 +41,7 @@ public:
     int             find_modes(char c);
     void            set_modes(std::string);
     void            unset_modes(std::string);
+    void            remove_admin(std::string name);
     
 };
 

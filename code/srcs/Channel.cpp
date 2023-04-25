@@ -76,13 +76,15 @@ void    Channel::add_admin(std::string user_nick){
 }
 
 void Channel::remove_user_from_channel_list(std::string username) {
+    std::vector<std::string>::iterator it;
+
     if (this->users_list.empty()) {
         return;
     }
-    std::vector<std::string>::iterator it = std::find(this->users_list.begin(), this->users_list.end(), username);
-    if (it != this->users_list.end()) {
+    it = find(this->users_list.begin(), this->users_list.end(), username);
+    if (it != this->users_list.end())
         this->users_list.erase(it);
-    }
+    std::cout << "user remouved from channel " + this->get_channel_name() << std::endl;
 }
 
 bool    Channel::is_admin(std::string username) {
@@ -205,4 +207,14 @@ void Channel::unset_modes(std::string modes)
         }
         i++;
     }
+}
+
+void    Channel::remove_admin(std::string name) {
+    std::vector<std::string>::iterator it;
+
+    if (this->admins.empty())
+        return ;
+    it = find(this->admins.begin(), this->admins.end(), name);
+    if (it != this->admins.end())
+        this->admins.erase(it);
 }
