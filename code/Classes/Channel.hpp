@@ -3,6 +3,7 @@
 
 #include <iostream>
 # include <vector>
+# include <map>
 
 class Channel
 {
@@ -10,9 +11,11 @@ private:
     std:: string name;
     std::vector <std::string>   admins;
     std:: string password;
+    std::string mode;
     std::vector <std::string>   users_list;
     std::string topic;
     std::vector <std::string>   invited_list;
+    std::map<char, bool> channel_modes ;
 
 public:
     Channel();
@@ -34,6 +37,12 @@ public:
     void            add_user_to_invite_qeue(std::string user);
     void            remove_user_to_invite_qeue(std::string user);
     bool            have_an_invite(std::string user);
+    void            set_channels_modes();
+    int             find_modes(char c);
+    void            set_modes(std::string);
+    void            unset_modes(std::string);
+    void            remove_admin(std::string name);
+    
 };
 
 #endif

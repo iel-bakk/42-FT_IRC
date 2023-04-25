@@ -45,6 +45,11 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
     return (461);
 }
 
+// int parse_mode(std:: string request, Server &server)
+// {
+    
+// }
+
 void    Channel::add_user_to_list(std::string user_nick) {
     this->users_list.push_back(user_nick);
 }
@@ -71,13 +76,15 @@ void    Channel::add_admin(std::string user_nick){
 }
 
 void Channel::remove_user_from_channel_list(std::string username) {
+    std::vector<std::string>::iterator it;
+
     if (this->users_list.empty()) {
         return;
     }
-    std::vector<std::string>::iterator it = std::find(this->users_list.begin(), this->users_list.end(), username);
-    if (it != this->users_list.end()) {
+    it = find(this->users_list.begin(), this->users_list.end(), username);
+    if (it != this->users_list.end())
         this->users_list.erase(it);
-    }
+    std::cout << "user remouved from channel " + this->get_channel_name() << std::endl;
 }
 
 bool    Channel::is_admin(std::string username) {
@@ -124,4 +131,89 @@ bool    Channel::have_an_invite(std::string user) {
     if (find(this->invited_list.begin(), this->invited_list.end(), user) != this->invited_list.end())
         return (true);
     return (false);
+}
+void Channel::set_channels_modes()
+{
+    channel_modes.insert (std::make_pair ('i',0));
+    channel_modes.insert (std::make_pair ('k',0));
+    channel_modes.insert (std::make_pair ('m',0));
+    channel_modes.insert (std::make_pair('p',0));
+    channel_modes.insert (std::make_pair('t',0));
+
+}
+
+int Channel::find_modes (char c)
+{
+    std::map<char, bool>::iterator it;
+    for (it = channel_modes.begin(); it != channel_modes.end(); it++)
+    {
+        if (it->first == c)
+            return (1);
+    }
+    return (0);
+}
+
+void Channel::set_modes(std::string modes)
+{
+    std::map<char, bool>::iterator it;
+    size_t i = 0;
+    // std::cout << param << std::endl;
+    while (i < modes.length())
+    {
+        // if (modes[i] == 'o')
+        //     if (param.empty())
+        //         return ;
+        if (find_modes(modes[i]))
+        {
+            for (it = channel_modes.begin(); it != channel_modes.end(); it++)
+            {
+                if (it->first == mode[i])
+                {
+                    if (it->second == true)
+                        std::cout << "this mode is alredy set" << std::endl;
+                    else if (it->second == false)
+                        it->second = true;
+                }
+
+            }
+   
+        }
+        i++;
+    }
+}
+
+void Channel::unset_modes(std::string modes)
+{
+    std::map<char, bool>::iterator it;
+    size_t i = 1;
+    while (i < modes.length())
+    {
+        // if (modes[i] == 'o')
+        //     if (param.empty())
+        //         return ;
+        if (find_modes(modes[i]))
+        {
+            for (it = channel_modes.begin(); it != channel_modes.end(); it++)
+            {
+                if (it->first == modes[i])
+                {
+                    if (it->second == false)
+                        std::cout << "this mode is alredy unset" << std::endl;
+                    else if (it->second == true)
+                        it->second = false;
+                }
+            }
+        }
+        i++;
+    }
+}
+
+void    Channel::remove_admin(std::string name) {
+    std::vector<std::string>::iterator it;
+
+    if (this->admins.empty())
+        return ;
+    it = find(this->admins.begin(), this->admins.end(), name);
+    if (it != this->admins.end())
+        this->admins.erase(it);
 }
