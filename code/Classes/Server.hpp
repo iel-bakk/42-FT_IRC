@@ -1,6 +1,7 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+#include <ctime>
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -81,6 +82,7 @@ class Server
 		void		send_topic_message_for_new_members(int socket, std::string channel);
 		void		set_topic_to_channel(std::string channel, std::string topic);
 		void		send_invite_message(std::string reciver, std::string sender, std::string channel);
+		void    	print_current_time(int socket);
 };
 
 #endif

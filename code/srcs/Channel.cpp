@@ -88,7 +88,6 @@ bool    Channel::is_admin(std::string username) {
 }
 
 bool    Channel::is_empty(std::string check) {
-    std::cout << "check : " << check << "." << std::endl;
     for (unsigned long i = 0; i != check.length() ; i++) {
         if (check[i] != ' ')
             return (false);
