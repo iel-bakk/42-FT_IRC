@@ -118,6 +118,7 @@ void Server:: accept_socket(void)
                         num_fds++;
                         Message my_message(this->new_socket_fd);
                         my_message.set_time();
+                        std::cout << "ikhan : " << count << std::endl;
                         this->file_vectors[count] = my_message;
                         count++;
                     }
@@ -159,7 +160,7 @@ void Server:: read_write_socket(int sockfd, int *num_fds, Message *new_user)
         check = new_user->parse_message(this->password, this->_buffer, *this);
     n = HandleError(check, sockfd);
     if (n < 0)
-    {
+    { 
         std:: cout << "Error: Writing From Socket" << std:: endl;
         exit(1);
     }
@@ -252,11 +253,17 @@ void Server:: close_socket(int socket)
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++){
         if (it->second.get_socket() == socket){
             remove_user_form_channels(it->second.get_client().get_nick_name());
+            break ;
         }
     }
     std:: cout << "Client is DISCONNECTED" << std:: endl;
     close(socket);
+    std::cout << "######## : " + this->file_vectors[my_place].get_client().get_nick_name() << std::endl ;
+    std::cout << "######## : " <<  this->file_vectors[my_place].get_socket() << std::endl ;
     this->file_vectors.erase(my_place);
+
+
+
 }
 
 int Server:: write_long_message(int sockfd)
@@ -584,7 +591,6 @@ void    Server::remove_user_form_channels(std::string client_name) {
             if (it->second.is_admin(client_name))
                 it->second.remove_admin(client_name);
             remove_user_from_channel(client_name, it->second.get_channel_name());
-            break ;
         }
     }
 }

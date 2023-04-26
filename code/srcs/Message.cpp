@@ -145,6 +145,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
    int check;
     check = 0;
 
+    std::cout << this->get_client().get_nick_name() << " soket : " << this->get_socket() <<std::endl;
     std::cout << "cmd: " << this->command << std::endl;
     if (this->command == "NICK")
     {
