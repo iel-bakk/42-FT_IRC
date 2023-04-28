@@ -594,3 +594,16 @@ void    Server::remove_user_form_channels(std::string client_name) {
         }
     }
 }
+
+void    Server::send_notice_message_to_channel(std::string channel_name, std::string message, std::string client) {
+    std::map<int, Message>::iterator it;
+    std::vector<std::string> users_list;
+    std::string                     msg;
+
+    msg = ":" + client + " NOTICE #" + channel_name + " :" + message + "\r\n";
+    users_list = this->channels[channel_name].get_users_list();
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
+        if (find(users_list.begin(), users_list.end(), it->second.get_client().get_nick_name()) != users_list.end())
+            send_a_message(it->second.get_socket(), msg);
+    }
+}

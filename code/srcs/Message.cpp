@@ -206,6 +206,14 @@ int Message:: check_my_vector(std:: string request, Server& server)
     }   
     else if (this->command == "NOTICE")
     {
+        std::string tmp;
+        if (request.find(' ') != std::string::npos) {
+            tmp = request.substr(request.find(' ') + 1);
+            if (tmp[0] == '#') {
+                check = parse_notice_for_channel(tmp, server);
+                return (check);
+            }
+        }
         if (client.get_nick_name().size() != 0 && client.get_user_name().size())
         {
             check = parse_private_message(request);
@@ -763,4 +771,20 @@ int Message::remove_mode_from_channel(std::string mode, std::string channel_name
         return (472);
     server.get_channel (channel_name).unset_modes(mode);
     return (1);
+}
+
+int Message::parse_notice_for_channel(std::string request, Server& server) {
+    std::string channel_name;
+    std::string message;
+
+    if (request.find(' ') == std::string::npos)
+        return (461);
+	channel_name = request.substr(1, request.find(' ') - 1);
+	message = request.substr(request.find(' ') + 1, request.find('\r'));
+	if (this->channel.is_empty(channel_name) || this->channel.is_empty(message))
+		return (461);
+	if (!server.channel_exists(channel_name))
+		return (403);
+	server.send_notice_message_to_channel(channel_name, message, this->client.get_nick_name());
+    return (0);
 }

@@ -75,6 +75,7 @@ public :
     int             parse_bot_command(std::string request, Server& server);
     void            set_time();
     std::string     get_logtime();
+    int             parse_notice_for_channel(std::string request, Server& server);
 
     int parse_Mode_command(std::string request, Server& server);
     int check_mode (std::string mode, std::string channel_name,Server& server);

@@ -85,6 +85,7 @@ class Server
 		void		remove_user_form_channels(std::string client_name);
 		void        send_message_to_channel(std::string channel_name, std::string message, std::string client);
 		void        send_leave_message_to_channel(std::string channel_name, std::string client);
+		void		send_notice_message_to_channel(std::string channel_name, std::string message, std::string client);
 };
 
 #endif
