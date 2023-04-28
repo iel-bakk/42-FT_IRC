@@ -246,6 +246,12 @@ int Server:: HandleError(int error_replies, int sockfd)
         case 471:
             num = write (sockfd, "ERR_CHANNELISFULL <channel> :Cannot join channel (+l)\r\n",55);
             break;
+        case 474:
+            num =  write (sockfd,"474 ERR_BANNEDFROMCHAN <channel> :Cannot join channel (+b)\r\n",60);
+            break;
+        case 478 :
+            num = write (sockfd, "478 ERR_BANLISTFULL <channel> <char> :Channel list is full\r\n",60);
+            break ;
         default:
             break;
     }

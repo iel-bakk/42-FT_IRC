@@ -83,11 +83,9 @@ int    Channel::add_admin(std::string user_nick){
     if (user_in_channel)
     {
         this->admins.push_back(user_nick);
-        return (0);
     }
     else
         return (441);
-    this->admins.push_back(user_nick);
 }
 
 void Channel::remove_user_from_channel_list(std::string username) {
@@ -214,6 +212,7 @@ int Channel::unset_modes(std::string modes)
             {
                 if (it->first == modes[i])
                 {
+                    std::cout << it->first << std::endl;
                     if (it->second == false)
                         std::cout << "this mode is alredy unset" << std::endl;
                     else if (it->second == true)
@@ -244,7 +243,13 @@ void Channel::execute_mode(char c,std::string param)
             std::cout << limit << std::endl;
             set_limit(limit);
         }
-
+        case 'b' :
+            if (!param.empty())
+            {
+                add_to_ban_list(param);
+            }
+        default :
+            break;
 
     }
     
@@ -270,4 +275,18 @@ bool Channel::user_is_in_channels(std::string param)
         }
     }
     return (false);
+}
+
+int Channel::add_to_ban_list(std::string user)
+{
+    if (user_in_channel)
+    {
+        if (limit_ban_list <= ban_list.size())
+            this->ban_list.push_back(user);
+        else
+            return (478);
+        return (0);
+    }
+    else 
+        return (447);
 }

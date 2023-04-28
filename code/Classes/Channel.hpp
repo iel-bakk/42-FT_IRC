@@ -19,6 +19,8 @@ private:
     size_t limit;
     bool limite;
     bool  user_in_channel;
+    std::vector    <std::string> ban_list;
+    size_t limit_ban_list = 10;
 
 public:
     Channel();
@@ -47,6 +49,7 @@ public:
     void            execute_mode(char,std::string);
     void            set_limit(int);
     bool            user_is_in_channels(std::string);
+    int             add_to_ban_list(std::string);
 };
 
 #endif
