@@ -683,14 +683,14 @@ int Message::parse_Mode_command(std::string request,Server& server)
 {
     std::string channel_name;
     std::string mode;
-    std::string param = NULL;
+    std::string param;
+
     if (request.find('+') == std::string::npos && request.find('-') == std::string::npos)
         return (461);
     if (request.find('+') != std::string::npos && request.find('-') != std::string::npos)
         return (472);
     if (request.find(' ') != std::string::npos && request.find(' ') + 1 != std::string::npos)// find #
     {
-
         channel_name = request.substr(request.find('#') + 1, request.find(' ', request.find('#')) - request.find('#') - 1);
 
         if (request.find('+') != std::string::npos)
