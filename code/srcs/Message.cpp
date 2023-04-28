@@ -785,6 +785,9 @@ int Message::parse_notice_for_channel(std::string request, Server& server) {
 		return (461);
 	if (!server.channel_exists(channel_name))
 		return (403);
-	server.send_notice_message_to_channel(channel_name, message, this->client.get_nick_name());
+    if (server.is_admin(channel_name, this->client.get_nick_name()))
+	    server.send_notice_message_to_channel(channel_name, message, this->client.get_nick_name());
+    else
+        return (482);
     return (0);
 }
