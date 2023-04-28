@@ -2,6 +2,8 @@
 
 Channel:: Channel()
 {
+    set_channels_modes();
+    
 }
 
 Channel:: ~Channel()
@@ -45,13 +47,19 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
     return (461);
 }
 
-// int parse_mode(std:: string request, Server &server)
-// {
-    
-// }
 
-void    Channel::add_user_to_list(std::string user_nick) {
-    this->users_list.push_back(user_nick);
+int    Channel::add_user_to_list(std::string user_nick) {
+    if (limite){//cmnd mode +l executed 
+        if (limit <= users_list.size()){
+            this->users_list.push_back(user_nick);
+            return (0);
+        }
+        else
+            return (471);
+    }
+    else // cas normal where no limit is set
+        this->users_list.push_back(user_nick);
+    return (0);
 }
 
 void    Channel::print_users_list() {
@@ -71,7 +79,14 @@ void    Channel::empty_channel() {
     this->password = "";
 }
 
-void    Channel::add_admin(std::string user_nick){
+int    Channel::add_admin(std::string user_nick){
+    if (user_in_channel)
+    {
+        this->admins.push_back(user_nick);
+        return (0);
+    }
+    else
+        return (441);
     this->admins.push_back(user_nick);
 }
 
@@ -136,13 +151,14 @@ void Channel::set_channels_modes()
     channel_modes.insert (std::make_pair ('i',0));
     channel_modes.insert (std::make_pair ('k',0));
     channel_modes.insert (std::make_pair ('m',0));
-    channel_modes.insert (std::make_pair('p',0));
-    channel_modes.insert (std::make_pair('t',0));
+    channel_modes.insert (std::make_pair('o',0));
+    channel_modes.insert (std::make_pair('l',0));
 
 }
 
 int Channel::find_modes (char c)
 {
+    
     std::map<char, bool>::iterator it;
     for (it = channel_modes.begin(); it != channel_modes.end(); it++)
     {
@@ -152,16 +168,16 @@ int Channel::find_modes (char c)
     return (0);
 }
 
-void Channel::set_modes(std::string modes)
+int Channel::set_modes(std::string modes,std::string param)
 {
     std::map<char, bool>::iterator it;
     size_t i = 0;
-    // std::cout << param << std::endl;
+    std::cout << "PARAM IN SET MODE "<< param << std::endl;
+    std::cout << "MODE  IN SET MODE "<< modes << std::endl;
     while (i < modes.length())
     {
-        // if (modes[i] == 'o')
-        //     if (param.empty())
-        //         return ;
+        if (modes.find("o") && param.empty())
+            return (472);
         if (find_modes(modes[i]))
         {
             for (it = channel_modes.begin(); it != channel_modes.end(); it++)
@@ -169,27 +185,29 @@ void Channel::set_modes(std::string modes)
                 if (it->first == mode[i])
                 {
                     if (it->second == true)
-                        std::cout << "this mode is alredy set" << std::endl;
+                    {
+                        std::cout << "this mode is already set" << std::endl;
+                    }
                     else if (it->second == false)
+                    {
                         it->second = true;
-                }
+                        execute_mode(it->first,param);
 
+                    }
+                }
             }
-   
         }
         i++;
     }
+    return (0);
 }
 
-void Channel::unset_modes(std::string modes)
+int Channel::unset_modes(std::string modes)
 {
     std::map<char, bool>::iterator it;
     size_t i = 1;
     while (i < modes.length())
     {
-        // if (modes[i] == 'o')
-        //     if (param.empty())
-        //         return ;
         if (find_modes(modes[i]))
         {
             for (it = channel_modes.begin(); it != channel_modes.end(); it++)
@@ -205,4 +223,51 @@ void Channel::unset_modes(std::string modes)
         }
         i++;
     }
+    return (0);
+}
+
+void Channel::execute_mode(char c,std::string param)
+{
+    switch (c)
+    {
+        case 'o' :
+            if (!param.empty())
+                if (user_is_in_channels(param))
+                    add_admin(param);
+        case 'l' :
+        limite = true;
+        if (param.empty())
+            limit  = 0 ;
+        else
+        {
+            limit  = atoi(param.c_str());
+            std::cout << limit << std::endl;
+            set_limit(limit);
+        }
+
+
+    }
+    
+        
+        
+}
+
+void Channel::set_limit(int user_num_channel)
+{
+    this->limit = user_num_channel;
+}
+
+bool Channel::user_is_in_channels(std::string param)
+{
+    std::vector <std::string>::iterator it;
+
+    for (it = users_list.begin(); it != users_list.end();it++)
+    {
+        if (*it == param)
+        {
+            return (true);
+            user_in_channel =  true;
+        }
+    }
+    return (false);
 }

@@ -137,6 +137,7 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
     if (check != 0 && check != 13 && check != 14)
         this->params.erase(this->params.end() - 1);
     }
+    std::cout << "ooooo\n"; 
     return (check);
 }
 
@@ -229,7 +230,9 @@ int Message:: check_my_vector(std:: string request, Server& server)
         return (check);
     }
     else if (this->command == "MODE") {
+    
       check =  parse_Mode_command(request, server);
+      return (check);
     }
    check = send_Message_identification(check);
    return (check);
@@ -632,7 +635,7 @@ int Message::parse_Mode_command(std::string request,Server& server)
 {
     std::string channel_name;
     std::string mode;
-    std::string param = NULL;
+    std::string param;
     if (request.find('+') == std::string::npos && request.find('-') == std::string::npos)
         return (461);
     if (request.find('+') != std::string::npos && request.find('-') != std::string::npos)
@@ -642,28 +645,30 @@ int Message::parse_Mode_command(std::string request,Server& server)
 
         channel_name = request.substr(request.find('#') + 1, request.find(' ', request.find('#')) - request.find('#') - 1);
 
+        std::cout <<"adam " <<request << std::endl;
+        std::cout << "channel " << channel_name << std::endl;
+
         if (request.find('+') != std::string::npos)
             mode = request.substr(request.find('+'));
         else if (request.find('-') != std::string::npos)
             mode  = request.substr(request.find('-'));
         if (mode.find(' ') != std::string::npos && mode.find(' ') + 1 != std::string::npos)
         {   
+            std::cout << "mode " << mode << std::endl;
             param = mode.substr(mode.find(' ') + 1);
             mode  = mode.substr(0, mode.find(' '));
-            std::cout << "mode " << mode << std::endl;
-            std::cout << "channel " << channel_name << std::endl;
             std::cout << "param " << param << std::endl;
             if(mode[0] == '+')
-                add_mode_to_channel(mode, channel_name,param, server);
+                return (add_mode_to_channel(mode, channel_name,param, server));
             else if(mode[0] == '-')
-                remove_mode_from_channel(mode, channel_name,param, server);
+                return (remove_mode_from_channel(mode, channel_name,param, server));
             else 
                 return (461); 
         }
         if(mode[0] == '+')
-            add_mode_to_channel(mode, channel_name, NULL,server);
+            return (add_mode_to_channel(mode, channel_name, NULL,server));
         else if(mode[0] == '-')
-            remove_mode_from_channel(mode, channel_name,NULL, server);
+            return (remove_mode_from_channel(mode, channel_name,NULL, server));
         else 
             return (461); 
     }
@@ -692,24 +697,30 @@ int Message::check_mode (std::string mode, std::string channel_name,Server &serv
 
 int Message::add_mode_to_channel(std::string mode, std::string channel_name,std::string param,Server &server)
 {
-    (void)param;
+    
     size_t i = 0;
-    while (mode[i] == '+')
-        i++;
+
     if (i < mode.length())
         mode = mode.substr(i + 1);
     else
         return (472);
+    std::cout << "here is add_mode to channel cout of mode :"<< mode << std::endl;
     if (!check_mode (mode, channel_name,server))
         return (472);
-    server.get_channel (channel_name).set_modes(mode);
-    return (1);
+    if (param.empty())
+    {
+        server.get_channel (channel_name).set_modes(mode,NULL);
+    }
+    else
+        server.get_channel (channel_name).set_modes(mode,param);
+
+    return (0);
 }
 
 int Message::remove_mode_from_channel(std::string mode, std::string channel_name,std::string param,Server& server)
 {
-    (void)param;
-        size_t i = 0;
+    std::cout << param << "zebbbbbbiiiiii2\n" << std::endl;
+    size_t i = 0;
     while (mode[i] == '-')
         i++;
     if (i < mode.length())
@@ -719,5 +730,5 @@ int Message::remove_mode_from_channel(std::string mode, std::string channel_name
      if (!check_mode (mode, channel_name,server))
         return (472);
     server.get_channel (channel_name).unset_modes(mode);
-    return (1);
+    return (0);
 }

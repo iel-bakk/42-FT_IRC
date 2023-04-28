@@ -218,6 +218,10 @@ int Server:: HandleError(int error_replies, int sockfd)
             _message = "436 ERR_NICKCOLLISION " + this->file_vectors[my_place].get_my_user() +  " :Nickname collision KILL\r\n";
             num = display_message(sockfd, _message);
             break;
+        case 441:
+            _message = "441 ERR_USERNOTINCHANNEL" +  this->file_vectors[my_place].get_my_user() +  "Channel->>specify channel <<-- :They aren't on that channel\r\n";
+            num  = display_message(sockfd, _message);
+            break;
         case 443:
             num = write(sockfd, "443 ERR_USERONCHANNEL:user already on channel\r\n", 47);
             break;
@@ -235,8 +239,12 @@ int Server:: HandleError(int error_replies, int sockfd)
             break;
         case 472:
             num = write(sockfd, "472 ERR_UNKNOWNMODE :is unknown mode char to me for this channel\r\n",66);
+            break;
         case 482:
             num = write(sockfd, "482 ERR_CHANOPRIVSNEEDED You're not channel operator\r\n", 54);
+            break;
+        case 471:
+            num = write (sockfd, "ERR_CHANNELISFULL <channel> :Cannot join channel (+l)\r\n",55);
             break;
         default:
             break;
