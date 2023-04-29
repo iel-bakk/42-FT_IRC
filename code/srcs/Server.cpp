@@ -250,7 +250,7 @@ int Server:: HandleError(int error_replies, int sockfd)
             num =  write (sockfd,"474 ERR_BANNEDFROMCHAN <channel> :Cannot join channel (+b)\r\n",60);
             break;
         case 478 :
-            num = write (sockfd, "478 ERR_BANLISTFULL <channel> <char> :Channel list is full\r\n",60);
+            num = write (sockfd, "478 ERR_BANLISTFULL <channel> (+b) :Channel list is full\r\n",60);
             break ;
         default:
             break;
@@ -553,4 +553,3 @@ void    Server::send_invite_message(std::string reciever, std::string sender, st
             send_a_message(it->second.get_socket(), message);
     }
 }
-

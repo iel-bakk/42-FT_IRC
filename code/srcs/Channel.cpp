@@ -3,6 +3,7 @@
 Channel:: Channel()
 {
     set_channels_modes();
+    limit_ban_list = 10;
     
 }
 
@@ -47,7 +48,6 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
     return (461);
 }
 
-
 int    Channel::add_user_to_list(std::string user_nick) {
     if (limite){//cmnd mode +l executed 
         if (limit <= users_list.size()){
@@ -82,10 +82,14 @@ void    Channel::empty_channel() {
 int    Channel::add_admin(std::string user_nick){
     if (user_in_channel)
     {
-        this->admins.push_back(user_nick);
+        if (!is_admin(user_nick))
+        {
+            this->admins.push_back(user_nick);
+        }
+        return (0);
     }
     else
-        return (441);
+        return (404);
 }
 
 void Channel::remove_user_from_channel_list(std::string username) {
@@ -174,7 +178,7 @@ int Channel::set_modes(std::string modes,std::string param)
     std::cout << "MODE  IN SET MODE "<< modes << std::endl;
     while (i < modes.length())
     {
-        if (modes.find("o") && param.empty())
+        if (modes.find('o') && param.empty())
             return (472);
         if (find_modes(modes[i]))
         {
@@ -182,15 +186,14 @@ int Channel::set_modes(std::string modes,std::string param)
             {
                 if (it->first == mode[i])
                 {
-                    if (it->second == true)
-                    {
-                        std::cout << "this mode is already set" << std::endl;
-                    }
+                    if (mode[i] == 'b')
+                        execute_mode(it->first,param);
+                    else if (it->second == true)
+                        std::cout <<"Mode: "<< it->first << " is already set /r/n" << std::endl;
                     else if (it->second == false)
                     {
                         it->second = true;
                         execute_mode(it->first,param);
-
                     }
                 }
             }
@@ -225,36 +228,40 @@ int Channel::unset_modes(std::string modes)
     return (0);
 }
 
-void Channel::execute_mode(char c,std::string param)
+int Channel::execute_mode(char c,std::string param)
 {
     switch (c)
     {
         case 'o' :
             if (!param.empty())
+            {
                 if (user_is_in_channels(param))
-                    add_admin(param);
+                    return (add_admin(param));
+            }
+            else 
+                return (461);
+        break;
         case 'l' :
         limite = true;
-        if (param.empty())
-            limit  = 0 ;
-        else
+        if (!param.empty())
         {
             limit  = atoi(param.c_str());
-            std::cout << limit << std::endl;
             set_limit(limit);
+            return (0);
         }
+        else
+            return (461);
+        break;
         case 'b' :
             if (!param.empty())
-            {
-                add_to_ban_list(param);
-            }
+                return (add_to_ban_list(param));
+            else
+                return (461);
         default :
+            return (472);
             break;
-
-    }
-    
-        
-        
+    }      
+    return (0);
 }
 
 void Channel::set_limit(int user_num_channel)
@@ -282,11 +289,16 @@ int Channel::add_to_ban_list(std::string user)
     if (user_in_channel)
     {
         if (limit_ban_list <= ban_list.size())
-            this->ban_list.push_back(user);
-        else
             return (478);
+        this->ban_list.push_back(user);
+        remove_user_from_channel_list(user);  
         return (0);
     }
-    else 
-        return (447);
+    else
+    {
+        if (limit_ban_list <= ban_list.size())
+            return (478);
+       this->ban_list.push_back(user);
+       return (0);
+    }
 }

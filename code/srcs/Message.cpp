@@ -653,11 +653,11 @@ int Message::parse_Mode_command(std::string request,Server& server)
         else if (request.find('-') != std::string::npos)
             mode  = request.substr(request.find('-'));
         if (mode.find(' ') != std::string::npos && mode.find(' ') + 1 != std::string::npos)
-        {   
-            std::cout << "mode " << mode << std::endl;
+        {  
             param = mode.substr(mode.find(' ') + 1);
             mode  = mode.substr(0, mode.find(' '));
-            std::cout << "param " << param << std::endl;
+            std::cout << "hahowa lmode dine dimah :" << mode << std::endl;
+            std::cout <<"hahowa param dine dimah :" <<"param " << param << std::endl;
             if(mode[0] == '+')
                 return (add_mode_to_channel(mode, channel_name,param, server));
             else if(mode[0] == '-')
@@ -680,18 +680,19 @@ int Message::parse_Mode_command(std::string request,Server& server)
 int Message::check_mode (std::string mode, std::string channel_name,Server &server)
 {
     size_t i = 1;
-
+    std::cout << "Checking mode hikigulog;::::::: " << mode << std::endl;
     if (server.channel_exists(channel_name) && server.user_exist_in_channel(channel_name,this->client.get_nick_name()))
     {
         while (i < mode.length())
         {
-            if (server.get_channel(channel_name).find_modes(mode[i]))
-                i++;
+            if (server.get_channel(channel_name).find_modes(mode[i]) == 0)
+                return (472);
+            i++;
         }
         return (1);
     }
     else
-        return (0);
+        return (403);
 }
 
 
@@ -702,8 +703,6 @@ int Message::add_mode_to_channel(std::string mode, std::string channel_name,std:
 
     if (i < mode.length())
         mode = mode.substr(i + 1);
-    else
-        return (472);
     std::cout << "here is add_mode to channel cout of mode :"<< mode << std::endl;
     if (!check_mode (mode, channel_name,server))
         return (472);
