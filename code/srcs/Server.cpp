@@ -118,6 +118,7 @@ void Server:: accept_socket(void)
                         num_fds++;
                         Message my_message(this->new_socket_fd);
                         my_message.set_time();
+                        std::cout << "ikhan : " << count << std::endl;
                         this->file_vectors[count] = my_message;
                         count++;
                     }
@@ -159,7 +160,7 @@ void Server:: read_write_socket(int sockfd, int *num_fds, Message *new_user)
         check = new_user->parse_message(this->password, this->_buffer, *this);
     n = HandleError(check, sockfd);
     if (n < 0)
-    {
+    { 
         std:: cout << "Error: Writing From Socket" << std:: endl;
         exit(1);
     }
@@ -234,6 +235,8 @@ int Server:: HandleError(int error_replies, int sockfd)
         case 462:
             num = write(sockfd, "462 ERR_ALREADYREGISTRED USER :Unauthorized command (already registered)\r\n", 74);
             break;
+        case 472:
+            num = write(sockfd, "472 ERR_UNKNOWNMODE :is unknown mode char to me for this channel\r\n",66);
         case 482:
             num = write(sockfd, "482 ERR_CHANOPRIVSNEEDED You're not channel operator\r\n", 54);
             break;
@@ -245,9 +248,22 @@ int Server:: HandleError(int error_replies, int sockfd)
 
 void Server:: close_socket(int socket)
 {
+    std::map<int , Message>::iterator it;
+
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++){
+        if (it->second.get_socket() == socket){
+            remove_user_form_channels(it->second.get_client().get_nick_name());
+            break ;
+        }
+    }
     std:: cout << "Client is DISCONNECTED" << std:: endl;
     close(socket);
+    std::cout << "######## : " + this->file_vectors[my_place].get_client().get_nick_name() << std::endl ;
+    std::cout << "######## : " <<  this->file_vectors[my_place].get_socket() << std::endl ;
     this->file_vectors.erase(my_place);
+
+
+
 }
 
 int Server:: write_long_message(int sockfd)
@@ -387,6 +403,21 @@ void    Server::send_message_to_channel(std::string channel_name,std::string mes
     }
 }
 
+void    Server::send_leave_message_to_channel(std::string channel_name, std::string client) {
+    std::map<int, Message> ::iterator it;
+    std::vector<std::string> list;
+    std::string msg;
+
+    list = this->channels[channel_name].get_users_list();
+    msg = ":" + client + " PART #" + channel_name + "\r\n";
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
+    {
+        if (find(list.begin(), list.end(), it->second.get_client().get_nick_name()) != list.end() && it->second.get_client().get_nick_name() != client)
+           if( send (it->second.get_socket(),msg.c_str(),msg.size(),0) < 0)
+                std::cout << "Error:  micaje not sind" << std::endl;
+    }
+}
+
 void    Server::send_join_message(std::string username, std::string channel_name) {
     std::map<int, Message>::iterator it;
     std::vector<std::string> list;
@@ -436,6 +467,8 @@ bool Server::user_exist_in_channel(std::string username, std::string channel_nam
 }
 
 void    Server::remove_user_from_channel(std::string username, std::string channel_name) {
+    if (this->channels[channel_name].get_users_list().empty())
+        return ;
     this->channels[channel_name].remove_user_from_channel_list(username);
 }
 
@@ -546,4 +579,31 @@ void    Server::print_current_time(int  socket){
 
     message = ":BOT NOTICE TIME : " + std::to_string(local_time->tm_hour) + ":" + std::to_string(local_time->tm_min) + ":" + std::to_string(local_time->tm_sec) + "\r\n";
     send_a_message(socket, message);
+}
+
+
+void    Server::remove_user_form_channels(std::string client_name) {
+    std::map<std::string, Channel>::iterator it;
+
+    for (it = this->channels.begin(); it != this->channels.end(); it++) {
+        if (user_exist_in_channel(client_name, it->second.get_channel_name())) {
+            send_leave_message_to_channel(it->second.get_channel_name(), client_name);
+            if (it->second.is_admin(client_name))
+                it->second.remove_admin(client_name);
+            remove_user_from_channel(client_name, it->second.get_channel_name());
+        }
+    }
+}
+
+void    Server::send_notice_message_to_channel(std::string channel_name, std::string message, std::string client) {
+    std::map<int, Message>::iterator it;
+    std::vector<std::string> users_list;
+    std::string                     msg;
+
+    msg = ":" + client + " NOTICE #" + channel_name + " :" + message + "\r\n";
+    users_list = this->channels[channel_name].get_users_list();
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
+        if (find(users_list.begin(), users_list.end(), it->second.get_client().get_nick_name()) != users_list.end())
+            send_a_message(it->second.get_socket(), msg);
+    }
 }
