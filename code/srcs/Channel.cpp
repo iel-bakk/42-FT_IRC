@@ -86,6 +86,8 @@ int    Channel::add_admin(std::string user_nick){
         {
             this->admins.push_back(user_nick);
         }
+        else
+            std::cout << "already added admin" << std::endl;    
         return (0);
     }
     else
@@ -237,6 +239,8 @@ int Channel::execute_mode(char c,std::string param)
             {
                 if (user_is_in_channels(param))
                     return (add_admin(param));
+                else
+                    return (std::cout <<  param << "is already admin" << std::endl,0);
             }
             else 
                 return (461);
