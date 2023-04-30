@@ -16,6 +16,11 @@ private:
     std::string topic;
     std::vector <std::string>   invited_list;
     std::map<char, bool> channel_modes ;
+    size_t limit;
+    bool limite;
+    bool  user_in_channel;
+    std::vector    <std::string> ban_list;
+    size_t limit_ban_list;
 
 public:
     Channel();
@@ -27,7 +32,7 @@ public:
     void            print_users_list();
     std::vector<std::string> get_users_list();
     void            empty_channel();
-    void            add_admin(std::string user_nick);
+    int            add_admin(std::string user_nick);
     void            remove_user_from_channel_list(std::string username);
     bool            is_admin(std::string username);
     bool            check_join_request(std::string request);
@@ -39,9 +44,14 @@ public:
     bool            have_an_invite(std::string user);
     void            set_channels_modes();
     int             find_modes(char c);
-    void            set_modes(std::string);
-    void            unset_modes(std::string);
+    int             set_modes(std::string,std::string);
+    int             unset_modes(std::string);
+    int            execute_mode(char,std::string);
+    void            set_limit(int);
+    bool            user_is_in_channels(std::string);
+    int             add_to_ban_list(std::string);
     void            remove_admin(std::string name);
+    bool            is_banned(std::string);
     
 };
 
