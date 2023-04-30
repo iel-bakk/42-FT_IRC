@@ -706,10 +706,11 @@ int Message::parse_Mode_command(std::string request,Server& server)
             mode  = request.substr(request.find('-'));
         if (mode.find(' ') != std::string::npos && mode.find(' ') + 1 != std::string::npos)
         {  
+        {  
             param = mode.substr(mode.find(' ') + 1);
             mode  = mode.substr(0, mode.find(' '));
-            std::cout << "hahowa lmode dine dimah :" << mode << std::endl;
             std::cout <<"hahowa param dine dimah :" <<"param " << param << std::endl;
+            std::cout << "hahowa lmode dine dimah :" << mode << std::endl;
             if(mode[0] == '+')
                 return (add_mode_to_channel(mode, channel_name,param, server));
             else if(mode[0] == '-')
