@@ -726,11 +726,11 @@ int Message::parse_Mode_command(std::string request,Server& server)
             return (461); 
     }
     return (461); 
+    }
+    return (0);
 }
 
-
-
-int Message::check_mode (std::string mode, std::string channel_name,Server &server)
+int Message::check_mode(std::string mode, std::string channel_name,Server &server)
 {
     size_t i = 1;
     std::cout << "Checking mode hikigulog;::::::: " << mode << std::endl;
@@ -746,7 +746,9 @@ int Message::check_mode (std::string mode, std::string channel_name,Server &serv
     }
     else
         return (403);
+    return (0);
 }
+
 
 
 int Message::add_mode_to_channel(std::string mode, std::string channel_name,std::string param,Server &server)
