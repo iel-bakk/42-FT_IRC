@@ -237,6 +237,10 @@ int Server:: HandleError(int error_replies, int sockfd)
             break;
         case 472:
             num = write(sockfd, "472 ERR_UNKNOWNMODE :is unknown mode char to me for this channel\r\n",66);
+            break ;
+        case 474:
+            num = write(sockfd, "474 ERR_BANNEDFROMCHAN <channel> :Cannot join channel (+b)\r\n",60);
+            break;
         case 482:
             num = write(sockfd, "482 ERR_CHANOPRIVSNEEDED You're not channel operator\r\n", 54);
             break;
