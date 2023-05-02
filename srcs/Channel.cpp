@@ -20,6 +20,7 @@ std::string Channel::get_channel_password() {
 
 int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
 {
+    
     std:: string tab;
     std::string pass;
 

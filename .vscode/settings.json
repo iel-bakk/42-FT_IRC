@@ -1,8 +1,11 @@
 {
     "files.associations": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "*.excalidraw": "json",
         "*.excalidrawlib": "json",
+=======
+>>>>>>> my_branch
 =======
 >>>>>>> my_branch
         "__bit_reference": "cpp",
@@ -11,6 +14,10 @@
         "__errc": "cpp",
         "__functional_base": "cpp",
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        "__hash_table": "cpp",
+>>>>>>> my_branch
 =======
         "__hash_table": "cpp",
 >>>>>>> my_branch
@@ -25,6 +32,10 @@
         "__tuple": "cpp",
         "algorithm": "cpp",
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        "array": "cpp",
+>>>>>>> my_branch
 =======
         "array": "cpp",
 >>>>>>> my_branch
@@ -34,6 +45,11 @@
         "cctype": "cpp",
         "chrono": "cpp",
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        "cmath": "cpp",
+        "complex": "cpp",
+>>>>>>> my_branch
 =======
         "cmath": "cpp",
         "complex": "cpp",
@@ -65,6 +81,10 @@
         "ostream": "cpp",
         "ratio": "cpp",
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        "sstream": "cpp",
+>>>>>>> my_branch
 =======
         "sstream": "cpp",
 >>>>>>> my_branch
@@ -77,6 +97,10 @@
         "type_traits": "cpp",
         "typeinfo": "cpp",
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        "unordered_map": "cpp",
+>>>>>>> my_branch
 =======
         "unordered_map": "cpp",
 >>>>>>> my_branch

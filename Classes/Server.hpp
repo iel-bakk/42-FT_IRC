@@ -59,8 +59,6 @@ class Server
 		void        add_User(int fd, std:: vector<std:: string> new_user);
 		int         write_long_message(int sockfd);
 		int         display_message(int sockfd, std:: string message);
-		int         display_error(void);
-		int         send_private_message(void);
 		bool        check_ctrl_D(std:: string buffer);
 		void        add_new_channel(Channel& new_channel);
 		bool        channel_exists(std::string channel);
@@ -88,6 +86,8 @@ class Server
 		void		send_notice_message_to_channel(std::string channel_name, std::string message, std::string client);
 		void		change_user_info(std::string username, std::string new_name);
 		void		modify_channel_data(std::string username, std::string new_name);
+        int			display_error(int sockfd);
+        int			send_private_message(int sockfd);
 };
 
 #endif

@@ -112,7 +112,7 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
         check = check_Error_Space(this->command);
         return (check);
     }
-    if (this->message.find(' ') != std:: string:: npos)
+    if (this->message.find(' ') != std:: string:: npos )
         this->message = handle_space(this->message, this->command);
     check = check_Password_Space(this->params.size(), this->command, this->message, password);
     if (check_upper(this->command))
@@ -143,6 +143,7 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
 int Message:: check_my_vector(std:: string request, Server& server)
 {
    int check;
+
     check = 0;
 
     std::cout << this->get_client().get_nick_name() << " soket : " << this->get_socket() <<std::endl;
@@ -341,24 +342,25 @@ int Message:: check_message(std:: string command)
     return (check);
 }
 
-int Message:: send_Message_identification(int check)
+int Message:: send_Message_identification()
 {
     std:: string message;
+    int check;
     char hostname[256];
     char time_str[11];
     std:: time_t    now = std::time(NULL);
     std:: tm    *local_time = std:: localtime(&now);
 
+    check = 0;
     std::strftime(time_str, sizeof(time_str), "%d/%m/%Y", local_time);
     gethostname(hostname, sizeof(hostname));
     if (client.get_nick_name().size() != 0 && client.get_user_name().size() != 0 && this->enter == false)
     {
-        this->hostname = std::string(hostname);
         this->welcome_message = ":irc.1337.ma 001 " + client.get_nick_name() + " : Welcome to Internet Chat Relay";
         this->host_message = ": 002 " + client.get_nick_name() + " Your Host is " + std:: string(hostname) + ", running version 1.0";
         this->server_message = ": 003 " + client.get_nick_name() + " Ther server was created on " + std:: string(time_str);
         this->enter = true;
-        return (check = 13);
+        return (13);
     }
     return (check);
 }
@@ -446,6 +448,12 @@ bool Message:: check_command(std:: string command)
     || command.find("INVITE") != std:: string:: npos || command.find("BOT") != std:: string:: npos)
         return false;
     return true;
+}
+
+void Message:: erase_user(void)
+{
+    this->my_user.erase();
+    client.erase_nickname();
 }
 
 std:: vector<std:: string> Message:: create_vector(void)
