@@ -86,6 +86,8 @@ class Server
 		void        send_message_to_channel(std::string channel_name, std::string message, std::string client);
 		void        send_leave_message_to_channel(std::string channel_name, std::string client);
 		void		send_notice_message_to_channel(std::string channel_name, std::string message, std::string client);
+		void		change_user_info(std::string username, std::string new_name);
+		void		modify_channel_data(std::string username, std::string new_name);
 };
 
 #endif

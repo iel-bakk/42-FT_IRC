@@ -28,6 +28,7 @@ private:
     std:: string message_to_send;
     std:: string notice_private;
     std:: vector<std:: string> params;
+    std:: vector<std:: string> Mychannels;
     Client client;
     Channel channel;
     std::vector<std::string> joined_channels;
@@ -77,11 +78,11 @@ public :
     std::string     get_logtime();
     int             parse_notice_for_channel(std::string request, Server& server);
     int check_mode (std::string mode, std::string channel_name,Server &server);
-
     int parse_Mode_command(std::string request, Server& server);
     int add_mode_to_channel(std::string,std::string,std::string,Server&);
     int remove_mode_from_channel(std::string,std::string,std::string,Server&);
-    // int check_mode (std::string mode, std::string channel_name,Server &server);
+    void    add_channel_to_my_list(std::string channel);
+    std::vector <std::string> get_my_channels_list();
 };
 
 #endif

@@ -60,7 +60,7 @@ void    Channel::print_users_list() {
     std::vector <std::string>::iterator it;
 
     for (it = this->users_list.begin(); it != this->users_list.end(); it++) {
-        std::cout << *it << std::endl;
+        std::cout <<"user : " << *it << std::endl;
     }
 }
 
@@ -96,9 +96,11 @@ void Channel::remove_user_from_channel_list(std::string username) {
     }
 
     it = find(this->users_list.begin(), this->users_list.end(), username);
-    if (it != this->users_list.end())
+    if (it != this->users_list.end()) {
         this->users_list.erase(it);
-    std::cout << "user remouved from channel " + this->get_channel_name() << std::endl;
+        std::cout << "user remouved from channel " + this->get_channel_name() << std::endl;
+    }
+    this->print_users_list();
 }
 
 bool    Channel::is_admin(std::string username) {
@@ -155,8 +157,8 @@ void Channel::set_channels_modes()
 
 int Channel::find_modes(char c)
 {
-    
     std::map<char, bool>::iterator it;
+
     for (it = channel_modes.begin(); it != channel_modes.end(); it++)
     {
         if (it->first == c)
@@ -172,6 +174,8 @@ int Channel::set_modes(std::string modes,std::string param)
     size_t i = 0;
     std::cout << "PARAM IN SET MODE "<< param << std::endl;
     std::cout << "MODE  IN SET MODE "<< modes << std::endl;
+    // if (param.empty())
+    //     return (0);
     while (i < modes.length())
     {
         cuurent_modes =  modes[i] ;

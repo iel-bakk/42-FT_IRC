@@ -459,7 +459,6 @@ std::string Server::get_channel_password(std::string channel_name) {
 
 bool Server::user_exist_in_channel(std::string username, std::string channel_name) {
     std::vector <std::string> list;
-    std::cout << ":" << channel_name << ":" << username << "." << std::endl;
     if (channel_exists(channel_name))
     {
         list = this->channels[channel_name].get_users_list();
@@ -609,5 +608,33 @@ void    Server::send_notice_message_to_channel(std::string channel_name, std::st
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
         if (find(users_list.begin(), users_list.end(), it->second.get_client().get_nick_name()) != users_list.end())
             send_a_message(it->second.get_socket(), msg);
+    }
+}
+
+void    Server::change_user_info(std::string username, std::string new_name)
+{
+    std::map<int, Message>::iterator it;
+
+        std::cout << "here is the username : " + new_name + "///////" << std::endl; 
+    for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
+        if (it->second.get_client().get_nick_name() == new_name) {
+        std::cout << "wssselt **********" << std::endl;
+            modify_channel_data(username, new_name);
+            break ;
+        }
+    }
+}
+
+void		Server::modify_channel_data(std::string username, std::string new_name) {
+    std::map<std::string, Channel>::iterator it;
+
+    std::cout << "here is the username : " + username << std::endl; 
+    for (it = this->channels.begin(); it != this->channels.end(); it++) {
+        if (it->second.user_is_in_channels(username)) {
+            std::cout << "new name ++++++++++++++++: " + new_name  << std::endl;
+            it->second.add_user_to_list(new_name);
+            it->second.remove_user_from_channel_list(username);
+            it->second.print_users_list();
+        }
     }
 }
