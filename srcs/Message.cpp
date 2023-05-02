@@ -256,7 +256,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
     else if (this->command == "MODE") {
       check =  parse_Mode_command(request, server);
     }
-   check = send_Message_identification(check);
+   check = send_Message_identification();
    return (check);
 }
 
@@ -450,11 +450,11 @@ bool Message:: check_command(std:: string command)
     return true;
 }
 
-void Message:: erase_user(void)
-{
-    this->my_user.erase();
-    client.erase_nickname();
-}
+// void Message:: erase_user(void)
+// {
+//     this->my_user.erase();
+//     client.erase_nickname();
+// }
 
 std:: vector<std:: string> Message:: create_vector(void)
 {

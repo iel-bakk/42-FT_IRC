@@ -283,11 +283,6 @@ void Server:: close_socket(int socket)
     std::cout << "######## : " + this->file_vectors[my_place].get_client().get_nick_name() << std::endl ;
     std::cout << "######## : " <<  this->file_vectors[my_place].get_socket() << std::endl ;
     this->file_vectors.erase(my_place);
-
-
-
-    std::map<int, Message>::iterator it;
-
     it = file_vectors.find(socket);
     if (it != file_vectors.end())
         this->file_vectors.erase(it);

@@ -54,8 +54,7 @@ int Client:: parse_nickname(std:: string vector, bool enter)
             return 436;
    }
    if (this->nick_name == message)
-   if (this->nick_name == message)
-        return check = 432;
+        return (check = 432);
     else
        this->nick_name = message;
    return check;
