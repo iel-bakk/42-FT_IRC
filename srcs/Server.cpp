@@ -77,9 +77,8 @@ void Server:: accept_socket(void)
 {
     size_t size;
     int num_fds;
-    int count;
     int sock;
-    int num;
+    // int num;
     int check;
     std:: vector<std:: string> new_user;
 
@@ -88,7 +87,6 @@ void Server:: accept_socket(void)
     this->fds[0].fd = this->sockfd;
     this->fds[0].events = POLLIN;
     num_fds = 1;
-    count = 0;
     while (true)
     {
         int ret = poll(this->fds, num_fds, -1);
@@ -119,33 +117,35 @@ void Server:: accept_socket(void)
                         this->fds[num_fds].events = POLLIN;
                         num_fds++;
                         Message my_message(this->new_socket_fd);
-                        this->file_vectors[count] = my_message;
-                        count++;
+                        this->file_vectors[new_socket_fd] = my_message;
                     }
                 }
                 else
                 {
                     sock = this->fds[i].fd;
-                    my_place = i - 1;
-                    read_write_socket(sock, &num_fds, &this->file_vectors[my_place]);
-                    if (my_place != 0)
-                    {
-                        if (this->file_vectors[my_place].get_my_user().size() != 0)
-                        {
-                                for (int i= 0; i != my_place; i++)
-                                {
-                                    if (this->file_vectors[i].get_my_user() == this->file_vectors[my_place].get_my_user())
-                                    {
-                                        std:: string _message = "436 ERR_NICKCOLLISION " + this->file_vectors[my_place].get_my_user() +  " :Nickname collision KILL\r\n";
-                                        num = display_message(this->file_vectors[my_place].get_socket(), _message);
-                                        this->file_vectors[my_place].erase_user();
-                                    }
-                                    check = HandleError(this->file_vectors[my_place].send_Message_identification(), this->file_vectors[my_place].get_socket());
-                                }
-                        }
-                    }
-                    else
-                            check = HandleError(this->file_vectors[my_place].send_Message_identification(), this->file_vectors[my_place].get_socket());
+                    read_write_socket(sock, &num_fds, &this->file_vectors[sock]);
+                    // std:: map<int, Message>:: iterator it = this->file_vectors.find(sock);
+                    // if (it != this->file_vectors.end())
+                    // {
+                    //     for (std:: map<int, Message>:: iterator _it = this->file_vectors.begin(); _it != this->file_vectors.end(); _it++)
+                    //     {
+                    //         if (_it->second.get_my_user())
+                    //     }
+                    // }
+                    // if (this->file_vectors[sock].get_my_user().size() != 0)
+                    // {
+                                // for (int i= 0; i != my_place; i++)
+                                // {
+                                    // if (this->file_vectors[i].get_my_user() == this->file_vectors[my_place].get_my_user())
+                                    // {
+                                    //     std:: string _message = "436 ERR_NICKCOLLISION " + this->file_vectors[my_place].get_my_user() +  " :Nickname collision KILL\r\n";
+                                    //     num = display_message(this->file_vectors[my_place].get_socket(), _message);
+                                    //     this->file_vectors[my_place].erase_user();
+                                    // }
+                                    // std:: cout << "SEND : " << this->file_vectors[sock].send_Message_identification() << " SOCK : " << this->file_vectors[sock].get_socket() << std:: endl;
+                                    check = HandleError(this->file_vectors[sock].send_Message_identification(), sock);
+                                // }
+                        // }
                 }
             }
         }
@@ -204,7 +204,7 @@ int Server:: HandleError(int error_replies, int sockfd)
             std:: cout << "Not Numeric" << std:: endl;
             break;
         case 11:
-            close_socket(this->file_vectors[my_place].get_socket());
+            close_socket(this->file_vectors[sockfd].get_socket());
             break;
         case 12:
             std:: cout << "Invalid Command" << std:: endl;
@@ -213,7 +213,7 @@ int Server:: HandleError(int error_replies, int sockfd)
             num = write_long_message(sockfd);
             break;
         case 14:
-            num = send_private_message();
+            num = send_private_message(sockfd);
             break;
         case 412:
             num = write(sockfd, "412 ERR_NOTEXTTOSEND :No text to send\r\n", 39);
@@ -222,11 +222,11 @@ int Server:: HandleError(int error_replies, int sockfd)
             num = write(sockfd, "431 ERR_NONICKNAMEGIVEN:No nickname given\r\n", 43);
             break;
         case 432:
-            _message = "432 ERR_ERRONEUSNICKNAME " + this->file_vectors[my_place].get_my_user() +  " :Erroneous nickname\r\n";
+            _message = "432 ERR_ERRONEUSNICKNAME " + this->file_vectors[sockfd].get_my_user() +  " :Erroneous nickname\r\n";
             num = display_message(sockfd, _message);
             break;
         case 436:
-            _message = "436 ERR_NICKCOLLISION " + this->file_vectors[my_place].get_my_user() +  " :Nickname collision KILL\r\n";
+            _message = "436 ERR_NICKCOLLISION " + this->file_vectors[sockfd].get_my_user() +  " :Nickname collision KILL\r\n";
             num = display_message(sockfd, _message);
             break;
         case 451:
@@ -236,7 +236,7 @@ int Server:: HandleError(int error_replies, int sockfd)
             num = write(sockfd, "464 ERR_PASSWDMISMATCH:Password incorrect\r\n", 43);
             break;
         case 461:
-            num = display_error();
+            num = display_error(sockfd);
             break;
         case 462:
             num = write(sockfd, "462 ERR_ALREADYREGISTRED USER :Unauthorized command (already registered)\r\n", 74);
@@ -251,7 +251,11 @@ void Server:: close_socket(int socket)
 {
     std:: cout << "Client is DISCONNECTED" << std:: endl;
     close(socket);
-    this->file_vectors.erase(my_place);
+    std::map<int, Message>::iterator it;
+
+    it = file_vectors.find(socket);
+    if (it != file_vectors.end())
+        this->file_vectors.erase(it);
 }
 
 int Server:: write_long_message(int sockfd)
@@ -260,36 +264,36 @@ int Server:: write_long_message(int sockfd)
 
     num = 0;
     std:: string message;
-
-    message = this->file_vectors[my_place].get_welcome_message() + "\r\n";
+    // std:: cout << "Message : " << this->file_vectors[sockfd].get_welcome_message() << std:: endl;
+    message = this->file_vectors[sockfd].get_welcome_message() + "\r\n";
     if (message.size() != 0)
         num = display_message(sockfd, message);
-    message = this->file_vectors[my_place].get_host_message() + "\r\n";
+    message = this->file_vectors[sockfd].get_host_message() + "\r\n";
     if (message.size() != 0)
         num = display_message(sockfd, message);
-    message = this->file_vectors[my_place].get_server_message() + "\r\n";
+    message = this->file_vectors[sockfd].get_server_message() + "\r\n";
     if (message.size() != 0)
         num = display_message(sockfd, message);
     
     return (num);
 }
 
-int Server:: send_private_message(void)
+int Server:: send_private_message(int sockfd)
 {
     int num = 0;
     std:: string message;
 
     for (size_t i = 0; i != this->file_vectors.size(); i++)
     {
-        if (this->file_vectors[i].get_my_user() == this->file_vectors[my_place].get_user_to_send())
+        if (this->file_vectors[i].get_my_user() == this->file_vectors[sockfd].get_user_to_send())
         {
-            message = ":" + this->file_vectors[my_place].get_my_user() + this->file_vectors[my_place].get_notice_private() + this->file_vectors[i].get_my_user() + " :" + this->file_vectors[my_place].get_message_to_send() + "\r\n";
+            message = ":" + this->file_vectors[sockfd].get_my_user() + this->file_vectors[sockfd].get_notice_private() + this->file_vectors[i].get_my_user() + " :" + this->file_vectors[my_place].get_message_to_send() + "\r\n";
             num = display_message(this->file_vectors[i].get_socket(), message);
             return (num);
         }
     }
-    message = "401 ERR_NOSUCHNICK " + this->file_vectors[my_place].get_user_to_send() + " :No such nick/channel" + "\r\n";
-    num = display_message(this->file_vectors[my_place].get_socket(), message);
+    message = "401 ERR_NOSUCHNICK " + this->file_vectors[sockfd].get_user_to_send() + " :No such nick/channel" + "\r\n";
+    num = display_message(this->file_vectors[sockfd].get_socket(), message);
     return num;
 }
 
@@ -307,18 +311,18 @@ int Server:: display_message(int sockfd, std:: string message)
     return (num);
 }
 
-int Server:: display_error(void)
+int Server:: display_error(int sockfd)
 {
     std:: string handle_message;
     std:: string message;
     int num;
 
-    if (this->file_vectors[my_place].get_command().find('\n') != std:: string:: npos)
-        handle_message = this->file_vectors[my_place].get_command().substr(0, this->file_vectors[my_place].get_command().size() - 2);
+    if (this->file_vectors[sockfd].get_command().find('\n') != std:: string:: npos)
+        handle_message = this->file_vectors[sockfd].get_command().substr(0, this->file_vectors[sockfd].get_command().size() - 2);
     else
-        handle_message = this->file_vectors[my_place].get_command();
+        handle_message = this->file_vectors[sockfd].get_command();
     message = "461 ERR_NEEDMOREPARAMS " + handle_message + " :Not enough parameters" + "\r\n";
-    num = display_message(this->file_vectors[my_place].get_socket(), message);
+    num = display_message(this->file_vectors[sockfd].get_socket(), message);
     return (num);
 }
 

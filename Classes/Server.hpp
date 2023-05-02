@@ -50,7 +50,7 @@ class Server
         void add_User(int fd, std:: vector<std:: string> new_user);
         int write_long_message(int sockfd);
         int display_message(int sockfd, std:: string message);
-        int display_error(void);
-        int send_private_message(void);
+        int display_error(int sockfd);
+        int send_private_message(int sockfd);
         bool check_ctrl_D(std:: string buffer);
 };
