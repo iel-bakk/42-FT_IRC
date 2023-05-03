@@ -90,10 +90,7 @@ void    Channel::empty_channel() {
 // }
 
 int    Channel::add_admin_to_list(int socket) {
-    if (user_is_in_channels(socket))
-        this->admins.push_back(socket);
-    else
-        return (461);
+    this->admins.push_back(socket);
     return (0);
 }
 
@@ -113,8 +110,9 @@ void Channel::remove_user_from_channel_list(int user) {
 }
 
 bool    Channel::is_admin(int socket) {
+    std::cout << "recieved :: " << socket << std::endl;
     if (find(this->admins.begin(), this->admins.end(), socket) != this->admins.end())
-        return (true);
+        return (std::cout << "true admin." << std::endl, true);
     return (false);
 }
 
