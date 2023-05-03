@@ -174,7 +174,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
                 server.send_join_message(this->client.get_nick_name(), this->channel.get_channel_name());
                 server.send_channel_users_list(this->channel.get_channel_name(), *this);
                 add_channel_to_my_list(this->channel.get_channel_name());
-                // this->channels[this->channel.get_channel_name()].add_admin_to_list(this->socket);
+                this->channels[this->channel.get_channel_name()].add_admin_to_list(this->socket);
             }
             else {
                 if (this->channel.is_banned(this->client.get_nick_name()))
@@ -189,17 +189,18 @@ int Message:: check_my_vector(std:: string request, Server& server)
                     add_channel_to_my_list(this->channel.get_channel_name());
                 }
                 else {
-                    check = 464;
+                    return (464);
                 }
             }
-            if (this->channel.is_banned(this->client.get_nick_name()))
-                    return (474);
+            // if (this->channel.is_banned(this->client.get_nick_name()))
+            //         return (474);
             this->add_a_channel_to_list(this->channel.get_channel_name());
             this->channel.empty_channel();
         }
     }
     else if (this->command == "PRIVMSG")
     {
+        std::cout << "PRIVMSG kan hna be3da 3el 2a9al" << std::endl;
         if (request[request.find(' ') + 1] == '#')
         {
             std::cout << "channel message." << std::endl;
@@ -254,7 +255,6 @@ int Message:: check_my_vector(std:: string request, Server& server)
     // else if (this->command == "MODE") {
     //   check =  parse_Mode_command(request, server);
     // }
-   check = send_Message_identification();
    return (check);
 }
 

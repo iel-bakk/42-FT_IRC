@@ -176,7 +176,7 @@ int Server:: HandleError(int error_replies, int sockfd)
     int num = 0;
     std:: string handle_message;
     std:: string _message;
-
+    std::cout << "hahowa sock_fd ["<<  sockfd << "]" << std::endl;
     switch (error_replies)
     {
         case 10:
@@ -291,12 +291,14 @@ int Server:: send_private_message(int sockfd)
 {
     int num = 0;
     std:: string message;
+    // std:: map<int, Message>::iterator it ;
 
+    std::cout << "dkhlate hna send_private message o hahowa l user dialna"  << this->file_vectors[sockfd].get_user_to_send() << std::endl;
     for (size_t i = 0; i != this->file_vectors.size(); i++)
     {
         if (this->file_vectors[i].get_my_user() == this->file_vectors[sockfd].get_user_to_send())
         {
-            message = ":" + this->file_vectors[sockfd].get_my_user() + this->file_vectors[sockfd].get_notice_private() + this->file_vectors[i].get_my_user() + " :" + this->file_vectors[my_place].get_message_to_send() + "\r\n";
+            message = ":" + this->file_vectors[sockfd].get_my_user() + this->file_vectors[sockfd].get_notice_private() + this->file_vectors[i].get_my_user() + " :" + this->file_vectors[sockfd].get_message_to_send() + "\r\n";
             num = display_message(this->file_vectors[i].get_socket(), message);
             return (num);
         }

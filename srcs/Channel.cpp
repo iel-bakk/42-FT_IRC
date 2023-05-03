@@ -26,9 +26,9 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
 
     if (channel.find('#') != std::string::npos) {
         tab = channel.substr(channel.find('#') + 1);
-        if (tab.find(' ') != std::string::npos && tab.find(' ') + 1 < tab.length() && tab[1] != ' ') {
+        if (tab.find(' ') != std::string::npos && tab.find(' ') + 1 < tab.length() && tab[0] != ' ') {
             pass = tab.substr(tab.find(' ') + 1, tab.find('\r') - 1);
-            tab = tab.substr(1, tab.find(' ') - 1);
+            tab = tab.substr(0, tab.find(' '));
             if (!is_empty(pass))
                 msg_channel.password = pass;
             msg_channel.name = tab;
