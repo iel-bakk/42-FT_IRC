@@ -53,4 +53,5 @@ class Server
         int display_error(int sockfd);
         int send_private_message(int sockfd);
         bool check_ctrl_D(std:: string buffer);
+        void check_Nick_send_message(int sock, Message *new_user);
 };

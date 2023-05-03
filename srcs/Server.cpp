@@ -79,7 +79,7 @@ void Server:: accept_socket(void)
     int num_fds;
     int sock;
     // int num;
-    int check;
+    // int check;
     std:: vector<std:: string> new_user;
 
     size = sizeof(this->socker_addr);
@@ -124,28 +124,6 @@ void Server:: accept_socket(void)
                 {
                     sock = this->fds[i].fd;
                     read_write_socket(sock, &num_fds, &this->file_vectors[sock]);
-                    // std:: map<int, Message>:: iterator it = this->file_vectors.find(sock);
-                    // if (it != this->file_vectors.end())
-                    // {
-                    //     for (std:: map<int, Message>:: iterator _it = this->file_vectors.begin(); _it != this->file_vectors.end(); _it++)
-                    //     {
-                    //         if (_it->second.get_my_user())
-                    //     }
-                    // }
-                    // if (this->file_vectors[sock].get_my_user().size() != 0)
-                    // {
-                                // for (int i= 0; i != my_place; i++)
-                                // {
-                                    // if (this->file_vectors[i].get_my_user() == this->file_vectors[my_place].get_my_user())
-                                    // {
-                                    //     std:: string _message = "436 ERR_NICKCOLLISION " + this->file_vectors[my_place].get_my_user() +  " :Nickname collision KILL\r\n";
-                                    //     num = display_message(this->file_vectors[my_place].get_socket(), _message);
-                                    //     this->file_vectors[my_place].erase_user();
-                                    // }
-                                    // std:: cout << "SEND : " << this->file_vectors[sock].send_Message_identification() << " SOCK : " << this->file_vectors[sock].get_socket() << std:: endl;
-                                    check = HandleError(this->file_vectors[sock].send_Message_identification(), sock);
-                                // }
-                        // }
                 }
             }
         }
@@ -182,6 +160,37 @@ void Server:: read_write_socket(int sockfd, int *num_fds, Message *new_user)
         std:: cout << "Error: Writing From Socket" << std:: endl;
         exit(1);
     }
+    check_Nick_send_message(sockfd, new_user);
+}
+
+void Server:: check_Nick_send_message(int sock, Message *new_user)
+{
+    int check;
+    int num;
+    
+    std:: map<int, Message>:: iterator it = this->file_vectors.find(sock);
+    std:: map<int, Message>:: iterator it_incre = this->file_vectors.begin();
+    if (it != this->file_vectors.end() && it != it_incre)
+    {
+        if (new_user->get_my_user().size() != 0)
+        {
+            if (it_incre != this->file_vectors.end())
+            {
+                for (; it_incre != it; ++it_incre)
+                {
+                    Message value = it_incre->second;
+                    if (value.get_my_user() == new_user->get_my_user())
+                    {
+                        std:: string _message = "436 ERR_NICKCOLLISION " + new_user->get_my_user() +  " :Nickname collision KILL\r\n";
+                        num = display_message(new_user->get_socket(), _message);
+                        new_user->erase_user();
+                        return ;
+                    }
+                }
+            }
+        }
+    }
+    check = HandleError(new_user->send_Message_identification(), sock);  
 }
 
 void Server:: send_socket(void)
@@ -287,7 +296,7 @@ int Server:: send_private_message(int sockfd)
     {
         if (this->file_vectors[i].get_my_user() == this->file_vectors[sockfd].get_user_to_send())
         {
-            message = ":" + this->file_vectors[sockfd].get_my_user() + this->file_vectors[sockfd].get_notice_private() + this->file_vectors[i].get_my_user() + " :" + this->file_vectors[my_place].get_message_to_send() + "\r\n";
+            message = ":" + this->file_vectors[sockfd].get_my_user() + this->file_vectors[sockfd].get_notice_private() + this->file_vectors[i].get_my_user() + " :" + this->file_vectors[sockfd].get_message_to_send() + "\r\n";
             num = display_message(this->file_vectors[i].get_socket(), message);
             return (num);
         }
