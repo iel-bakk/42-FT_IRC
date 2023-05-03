@@ -349,7 +349,7 @@ bool Server:: check_ctrl_D(std:: string buffer)
     return (false);
 }
 
-Channel Server::get_channel(std::string channel_name) {
+Channel& Server::get_channel(std::string channel_name) {
     return (this->channels[channel_name]);
 }
 

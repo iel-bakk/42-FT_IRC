@@ -84,6 +84,7 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
 {
     int check = 0;
 
+    std::cout << "host name : " << this->hostname << std::endl;
     std::cout << "stoof : " << message << std::endl;
     this->message = message;
         if (strncmp("LIST", message.c_str(), 4) == 0) {
@@ -157,7 +158,6 @@ int Message:: check_my_vector(std:: string request, Server& server)
         if (check != 0)
             return check;
         check = check_message(this->message);
-        // server.change_user_info(old_nick, this->client.get_nick_name());
     }
     else if (this->command == "USER")
         check = client.parse_username(request);
@@ -177,7 +177,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
                 this->channels[this->channel.get_channel_name()].add_admin_to_list(this->socket);
             }
             else {
-                if (this->channel.is_banned(this->client.get_nick_name()))
+                if (this->channel.is_banned(this->socket))
                     return (474);
                 if (this->channel.get_channel_password() == server.get_channel_password(this->channel.get_channel_name())) {
                 if (server.user_exist_in_channel(this->get_socket(), this->channel.get_channel_name()))
@@ -192,8 +192,6 @@ int Message:: check_my_vector(std:: string request, Server& server)
                     return (464);
                 }
             }
-            // if (this->channel.is_banned(this->client.get_nick_name()))
-            //         return (474);
             this->add_a_channel_to_list(this->channel.get_channel_name());
             this->channel.empty_channel();
         }
@@ -252,9 +250,9 @@ int Message:: check_my_vector(std:: string request, Server& server)
         check = parse_kick_command(request, server);
         return (check);
     }
-    // else if (this->command == "MODE") {
-    //   check =  parse_Mode_command(request, server);
-    // }
+    else if (this->command == "MODE") {
+      check =  parse_Mode_command(request, server);
+    }
    return (check);
 }
 
@@ -691,98 +689,98 @@ std::string    Message::get_logtime() {
     return (log);
 }
 
-// int Message::parse_Mode_command(std::string request,Server& server)
-// {
-//     std::string channel_name;
-//     std::string mode;
-//     std::string param;
+int Message::parse_Mode_command(std::string request,Server& server)
+{
+    std::string channel_name;
+    std::string mode;
+    std::string param;
 
-//     if (request.find('+') == std::string::npos && request.find('-') == std::string::npos)
-//         return (461);
-//     if (request.find('+') != std::string::npos && request.find('-') != std::string::npos)
-//         return (472);
-//     if (request.find(' ') != std::string::npos && request.find(' ') + 1 != std::string::npos)// find #
-//     {
-//         channel_name = request.substr(request.find('#') + 1, request.find(' ', request.find('#')) - request.find('#') - 1);
-//         std::cout <<"adam " <<request << std::endl;
-//         std::cout << "channel " << channel_name << std::endl;
+    if (request.find('+') == std::string::npos && request.find('-') == std::string::npos)
+        return (461);
+    if (request.find('+') != std::string::npos && request.find('-') != std::string::npos)
+        return (472);
+    if (request.find(' ') != std::string::npos && request.find(' ') + 1 != std::string::npos)// find #
+    {
+        channel_name = request.substr(request.find('#') + 1, request.find(' ', request.find('#')) - request.find('#') - 1);
+        std::cout <<"adam " <<request << std::endl;
+        std::cout << "channel " << channel_name << std::endl;
 
-//         if (request.find('+') != std::string::npos)
-//             mode = request.substr(request.find('+'));
-//         else if (request.find('-') != std::string::npos)
-//             mode  = request.substr(request.find('-'));
-//         if (mode.find(' ') != std::string::npos && mode.find(' ') + 1 != std::string::npos)
-//         { 
-//             param = mode.substr(mode.find(' ') + 1);
-//             mode  = mode.substr(0, mode.find(' '));
-//             std::cout <<"hahowa param dine dimah :" <<"param " << param << std::endl;
-//             std::cout << "hahowa lmode dine dimah :" << mode << std::endl;
-//             if(mode[0] == '+')
-//                 return (add_mode_to_channel(mode, channel_name,param, server));
-//             else if(mode[0] == '-')
-//                 return (remove_mode_from_channel(mode, channel_name,param, server));
-//             else 
-//                 return (461); 
-//         }
-//         if (mode[0] == '+')
-//             return (add_mode_to_channel(mode, channel_name, NULL,server));
-//         else if(mode[0] == '-')
-//             return (remove_mode_from_channel(mode, channel_name,NULL, server));
-//         else 
-//             return (461); 
-//     }
-//     return (461); 
-// }
+        if (request.find('+') != std::string::npos)
+            mode = request.substr(request.find('+'));
+        else if (request.find('-') != std::string::npos)
+            mode  = request.substr(request.find('-'));
+        if (mode.find(' ') != std::string::npos && mode.find(' ') + 1 != std::string::npos)
+        { 
+            param = mode.substr(mode.find(' ') + 1);
+            mode  = mode.substr(0, mode.find(' '));
+            std::cout <<"hahowa param dine dimah :" <<"param " << param << std::endl;
+            std::cout << "hahowa lmode dine dimah :" << mode << std::endl;
+            if(mode[0] == '+')
+                return (add_mode_to_channel(mode, channel_name,param, server));
+            else if(mode[0] == '-')
+                return (remove_mode_from_channel(mode, channel_name,param, server));
+            else 
+                return (461); 
+        }
+        if (mode[0] == '+')
+            return (add_mode_to_channel(mode, channel_name, NULL,server));
+        else if(mode[0] == '-')
+            return (remove_mode_from_channel(mode, channel_name,NULL, server));
+        else 
+            return (461); 
+    }
+    return (461); 
+}
 
-// int Message::check_mode(std::string mode, std::string channel_name,Server &server)
-// {
-//     size_t i = 1;
-//     std::cout << "Checking mode hikigulog;::::::: " << mode << std::endl;
-//     if (server.channel_exists(channel_name) && server.user_exist_in_channel(this->socket, channel_name))
-//     {
-//         while (i < mode.length())
-//         {
-//             if (server.get_channel(channel_name).find_modes(mode[i]) == 0)
-//                 return (472);
-//             i++;
-//         }
-//         return (1);
-//     }
-//     else
-//         return (403);
-//     return (0);
-// }
+int Message::check_mode(std::string mode, std::string channel_name,Server &server)
+{
+    size_t i = 1;
+    std::cout << "Checking mode hikigulog;::::::: " << mode << std::endl;
+    if (server.channel_exists(channel_name) && server.user_exist_in_channel(this->socket, channel_name))
+    {
+        while (i < mode.length())
+        {
+            if (server.get_channel(channel_name).find_modes(mode[i]) == 0)
+                return (472);
+            i++;
+        }
+        return (1);
+    }
+    else
+        return (403);
+    return (0);
+}
 
-// int Message::add_mode_to_channel(std::string mode, std::string channel_name,std::string param,Server &server)
-// {
-//     mode = mode.substr(1);
-//     if (!check_mode (mode, channel_name,server))
-//         return (472);
-//     if (param.empty())
-//     {
-//         server.get_channel (channel_name).set_modes(mode,"");
-//     }
-//     else
-//         server.get_channel (channel_name).set_modes(mode,param);
-//     std::cout << "here is add_mode to channel cout of mode :"<< mode << std::endl;
-//     return (0);
-// }
+int Message::add_mode_to_channel(std::string mode, std::string channel_name,std::string param,Server &server)
+{
+    mode = mode.substr(1);
+    if (!check_mode (mode, channel_name,server))
+        return (472);
+    if (param.empty())
+    {
+        server.get_channel(channel_name).set_modes(mode,"", server.get_user_socket(param));
+    }
+    else
+        server.get_channel (channel_name).set_modes(mode,param, server.get_user_socket(param));
+    std::cout << "here is add_mode to channel cout of mode :"<< mode << std::endl;
+    return (0);
+}
 
-// int Message::remove_mode_from_channel(std::string mode, std::string channel_name,std::string param,Server& server)
-// {
-//     (void)param;
-//         size_t i = 0;
-//     while (mode[i] == '-')
-//         i++;
-//     if (i < mode.length())
-//         mode = mode.substr(i + 1);
-//     else
-//         return (472);
-//      if (!check_mode (mode, channel_name,server))
-//         return (472);
-//     server.get_channel (channel_name).unset_modes(mode);
-//     return (1);
-// }
+int Message::remove_mode_from_channel(std::string mode, std::string channel_name,std::string param,Server& server)
+{
+    (void)param;
+        size_t i = 0;
+    while (mode[i] == '-')
+        i++;
+    if (i < mode.length())
+        mode = mode.substr(i + 1);
+    else
+        return (472);
+     if (!check_mode (mode, channel_name,server))
+        return (472);
+    server.get_channel (channel_name).unset_modes(mode);
+    return (1);
+}
 
 int Message::parse_notice_for_channel(std::string request, Server& server) {
     std::string channel_name;

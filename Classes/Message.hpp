@@ -77,12 +77,12 @@ public :
     void            set_time();
     std::string     get_logtime();
     int             parse_notice_for_channel(std::string request, Server& server);
-    int check_mode (std::string mode, std::string channel_name,Server &server);
-    int parse_Mode_command(std::string request, Server& server);
-    int add_mode_to_channel(std::string,std::string,std::string,Server&);
-    int remove_mode_from_channel(std::string,std::string,std::string,Server&);
-    void    add_channel_to_my_list(std::string channel);
-    std::vector <std::string> get_my_channels_list();
+    int             check_mode (std::string mode, std::string channel_name,Server &server);
+    int             parse_Mode_command(std::string request, Server& server);
+    int             add_mode_to_channel(std::string,std::string,std::string,Server&);
+    int             remove_mode_from_channel(std::string,std::string,std::string,Server&);
+    void            add_channel_to_my_list(std::string channel);
+    std::vector<std::string> get_my_channels_list();
 };
 
 #endif

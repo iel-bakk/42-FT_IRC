@@ -19,7 +19,7 @@ private:
     size_t limit;
     bool limite;
     bool  user_in_channel;
-    std::vector    <std::string> ban_list;
+    std::vector    <int> ban_list;
     size_t limit_ban_list;
 
 public:
@@ -32,7 +32,6 @@ public:
     void                        print_users_list();
     std::vector<int>            get_users_list();
     void                        empty_channel();
-    // int                         add_admin(std::string user_nick);
     void                        remove_user_from_channel_list(int username);
     bool                        is_admin(int socket);
     bool                        check_join_request(std::string request);
@@ -44,14 +43,14 @@ public:
     bool                        have_an_invite(int user);
     void                        set_channels_modes();
     int                         find_modes(char c);
-    // int                         set_modes(std::string,std::string);
+    int                         set_modes(std::string,std::string, int socket);
     int                         unset_modes(std::string);
-    // int                         execute_mode(char,std::string);
+    int                         execute_mode(char,std::string, int user_socket);
     void                        set_limit(int);
     bool                        user_is_in_channels(int socket);
-    int                         add_to_ban_list(std::string);
+    int                         add_to_ban_list(int);
     void                        remove_admin(int socket);
-    bool                        is_banned(std::string);
+    bool                        is_banned(int);
     std::vector <std::string>   get_my_channels_list();
     int    add_admin_to_list(int socket);
 };
