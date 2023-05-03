@@ -346,4 +346,3 @@ bool           Channel::is_banned(std::string user)
     }
     return (false);
 }
-
