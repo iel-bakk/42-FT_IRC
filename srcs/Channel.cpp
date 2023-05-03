@@ -53,19 +53,19 @@ int Channel:: parse_channel(std:: string channel, Channel& msg_channel)
     
 // }
 
-void    Channel::add_user_to_list(std::string user_nick) {
-    this->users_list.push_back(user_nick);
+void    Channel::add_user_to_list(int user) {
+    this->users_list.push_back(user);
 }
 
 void    Channel::print_users_list() {
-    std::vector <std::string>::iterator it;
+    std::vector <int>::iterator it;
 
     for (it = this->users_list.begin(); it != this->users_list.end(); it++) {
         std::cout <<"user : " << *it << std::endl;
     }
 }
 
-std::vector<std::string> Channel::get_users_list() {
+std::vector<int> Channel::get_users_list() {
     return (this->users_list);
 }
 
@@ -74,29 +74,37 @@ void    Channel::empty_channel() {
     this->password = "";
 }
 
-int    Channel::add_admin(std::string user_nick){
-    if (user_in_channel)
-    {
-        if (!is_admin(user_nick))
-        {
-            this->admins.push_back(user_nick);
-        }
-        else
-            std::cout << "already added admin" << std::endl;    
-        return (0);
-    }
+// int    Channel::add_admin(std::string user_nick){
+//     if (user_in_channel)
+//     {
+//         if (!is_admin(user_nick))
+//         {
+//             this->admins.push_back(user_nick);
+//         }
+//         else
+//             std::cout << "already added admin" << std::endl;    
+//         return (0);
+//     }
+//     else
+//         return (404);
+// }
+
+int    Channel::add_admin_to_list(int socket) {
+    if (user_is_in_channels(socket))
+        this->admins.push_back(socket);
     else
-        return (404);
+        return (461);
+    return (0);
 }
 
-void Channel::remove_user_from_channel_list(std::string username) {
-    std::vector<std::string>::iterator it;
+void Channel::remove_user_from_channel_list(int user) {
+    std::vector<int>::iterator it;
 
     if (this->users_list.empty()) {
         return;
     }
 
-    it = find(this->users_list.begin(), this->users_list.end(), username);
+    it = find(this->users_list.begin(), this->users_list.end(), user);
     if (it != this->users_list.end()) {
         this->users_list.erase(it);
         std::cout << "user remouved from channel " + this->get_channel_name() << std::endl;
@@ -104,8 +112,8 @@ void Channel::remove_user_from_channel_list(std::string username) {
     this->print_users_list();
 }
 
-bool    Channel::is_admin(std::string username) {
-    if (find(this->admins.begin(), this->admins.end(), username) != this->admins.end())
+bool    Channel::is_admin(int socket) {
+    if (find(this->admins.begin(), this->admins.end(), socket) != this->admins.end())
         return (true);
     return (false);
 }
@@ -126,12 +134,13 @@ std::string Channel::get_topic() {
     return (this->topic);
 }
 
-void    Channel::add_user_to_invite_qeue(std::string user) {
-    this->invited_list.push_back(user);
+void    Channel::add_user_to_invite_qeue(int user) {
+    if (user != -1)
+        this->invited_list.push_back(user);
 }
 
-void    Channel::remove_user_to_invite_qeue(std::string user) {
-    std::vector<std::string>::iterator it;
+void    Channel::remove_user_to_invite_qeue(int user) {
+    std::vector<int>::iterator it;
     size_t  index = 0;
 
     for (it = this->invited_list.begin(); it != this->invited_list.end(); it++)
@@ -144,7 +153,7 @@ void    Channel::remove_user_to_invite_qeue(std::string user) {
     }
 }
 
-bool    Channel::have_an_invite(std::string user) {
+bool    Channel::have_an_invite(int user) {
     if (find(this->invited_list.begin(), this->invited_list.end(), user) != this->invited_list.end())
         return (true);
     return (false);
@@ -168,44 +177,44 @@ int Channel::find_modes(char c)
     return (0);
 }
 
-int Channel::set_modes(std::string modes,std::string param)
-{
-    char cuurent_modes ;
-    std::map<char, bool>::iterator it;
-    size_t i = 0;
-    std::cout << "PARAM IN SET MODE "<< param << std::endl;
-    std::cout << "MODE  IN SET MODE "<< modes << std::endl;
-    // if (param.empty())
-    //     return (0);
-    while (i < modes.length())
-    {
-        cuurent_modes =  modes[i] ;
-        std::cout << "current mode :" << "["<<cuurent_modes<<"]" <<std::endl;
-        if (find_modes(cuurent_modes))
-        {
-            for (it = channel_modes.begin(); it != channel_modes.end(); it++)
-            {
-                std::cout << "dkhlate hna west iterator dial modes" << std::endl;
-                std::cout  << "channel mode 99900666"<<it->first << " " << it->second << std::endl;
-                    std::cout << "[" << cuurent_modes << "]" << std::endl;
-                if (it->first == cuurent_modes)
-                {
-                    if (it->second == true)
-                        std::cout <<"Mode: "<< it->first << " is already set /r/n";
-                    else
-                    {
-                        it->second = true;
-                        return (execute_mode(it->first,param));
-                    }
-                }
-            }
-        }
-        else
-            return (472);
-        i++;
-    }
-    return (0);
-}
+// int Channel::set_modes(std::string modes,std::string param)
+// {
+//     char cuurent_modes ;
+//     std::map<char, bool>::iterator it;
+//     size_t i = 0;
+//     std::cout << "PARAM IN SET MODE "<< param << std::endl;
+//     std::cout << "MODE  IN SET MODE "<< modes << std::endl;
+//     // if (param.empty())
+//     //     return (0);
+//     while (i < modes.length())
+//     {
+//         cuurent_modes =  modes[i] ;
+//         std::cout << "current mode :" << "["<<cuurent_modes<<"]" <<std::endl;
+//         if (find_modes(cuurent_modes))
+//         {
+//             for (it = channel_modes.begin(); it != channel_modes.end(); it++)
+//             {
+//                 std::cout << "dkhlate hna west iterator dial modes" << std::endl;
+//                 std::cout  << "channel mode 99900666"<<it->first << " " << it->second << std::endl;
+//                     std::cout << "[" << cuurent_modes << "]" << std::endl;
+//                 if (it->first == cuurent_modes)
+//                 {
+//                     if (it->second == true)
+//                         std::cout <<"Mode: "<< it->first << " is already set /r/n";
+//                     else
+//                     {
+//                         it->second = true;
+//                         return (execute_mode(it->first,param));
+//                     }
+//                 }
+//             }
+//         }
+//         else
+//             return (472);
+//         i++;
+//     }
+//     return (0);
+// }
 
 int Channel::unset_modes(std::string modes)
 {
@@ -234,57 +243,57 @@ int Channel::unset_modes(std::string modes)
     return (0);
 }
 
-int Channel::execute_mode(char c,std::string param)
-{
-    std::cout << "dkhlate eexcute mode" << std::endl;
-    switch (c)
-    {
-        case 'o' :
-            if (!param.empty())
-            {
-                if (user_is_in_channels(param))
-                    return (add_admin(param));
-                else
-                    return (std::cout <<  param << "is already admin" << std::endl,0);
-            }
-            else 
-                return (461);
-        break;
-        case 'l' :
-        limite = true;
-        if (!param.empty())
-        {
-            limit  = atoi(param.c_str());
-            set_limit(limit);
-            return (0);
-        }
-        else
-            return (461);
-        break;
-        case 'b' :
-            if (!param.empty())
-                return (add_to_ban_list(param));
-            else
-                return (461);
-        default :
-            return (472);
-            break;
-    }      
-    return (0);
-}
+// int Channel::execute_mode(char c,std::string param)
+// {
+//     std::cout << "dkhlate eexcute mode" << std::endl;
+//     switch (c)
+//     {
+//         case 'o' :
+//             if (!param.empty())
+//             {
+//                 if (user_is_in_channels(param))
+//                     return (add_admin(param));
+//                 else
+//                     return (std::cout <<  param << "is already admin" << std::endl,0);
+//             }
+//             else 
+//                 return (461);
+//         break;
+//         case 'l' :
+//         limite = true;
+//         if (!param.empty())
+//         {
+//             limit  = atoi(param.c_str());
+//             set_limit(limit);
+//             return (0);
+//         }
+//         else
+//             return (461);
+//         break;
+//         case 'b' :
+//             if (!param.empty())
+//                 return (add_to_ban_list(param));
+//             else
+//                 return (461);
+//         default :
+//             return (472);
+//             break;
+//     }      
+//     return (0);
+// }
 
 void Channel::set_limit(int user_num_channel)
 {
     this->limit = user_num_channel;
 }
 
-bool Channel::user_is_in_channels(std::string param)
+bool Channel::user_is_in_channels(int socket)
 {
-    std::vector <std::string>::iterator it;
+    std::vector <int>::iterator it;
 
     for (it = users_list.begin(); it != users_list.end();it++)
     {
-        if (*it == param)
+        if (*it == socket)
         {
             return (true);
             user_in_channel =  true;
@@ -293,36 +302,36 @@ bool Channel::user_is_in_channels(std::string param)
     return (false);
 }
 
-int Channel::add_to_ban_list(std::string user)
-{
-    if (user_is_in_channels(user))
-    {
-        if (limit_ban_list <= ban_list.size())
-            return (478);
-        this->ban_list.push_back(user);
-        remove_user_from_channel_list(user);
-        std::vector<std::string>::iterator it ;
-        for (it = ban_list.begin(); it != ban_list.end(); it++)
-        {
-            std::cout << *it << std::endl;
-        }
-        return (0);
-    }
-    else
-    {
-        if (limit_ban_list <= ban_list.size())
-            return (478);
-       this->ban_list.push_back(user);
-       return (0);
-    }
-}
+// int Channel::add_to_ban_list(int socket)
+// {
+//     if (user_is_in_channels(socket))
+//     {
+//         if (limit_ban_list <= ban_list.size())
+//             return (478);
+//         this->ban_list.push_back(user);
+//         remove_user_from_channel_list(user);
+//         std::vector<std::string>::iterator it ;
+//         for (it = ban_list.begin(); it != ban_list.end(); it++)
+//         {
+//             std::cout << *it << std::endl;
+//         }
+//         return (0);
+//     }
+//     else
+//     {
+//         if (limit_ban_list <= ban_list.size())
+//             return (478);
+//        this->ban_list.push_back(user);
+//        return (0);
+//     }
+// }
 
-void    Channel::remove_admin(std::string name) {
-    std::vector<std::string>::iterator it;
+void    Channel::remove_admin(int socket) {
+    std::vector<int>::iterator it;
 
     if (this->admins.empty())
         return ;
-    it = find(this->admins.begin(), this->admins.end(), name);
+    it = find(this->admins.begin(), this->admins.end(), socket);
     if (it != this->admins.end())
         this->admins.erase(it);
 }
