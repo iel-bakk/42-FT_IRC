@@ -84,8 +84,8 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
 {
     int check = 0;
 
+    std::cout << "host name : " << this->hostname << std::endl;
     std::cout << "stoof : " << message << std::endl;
-    // std::cout << "message : " << message << std::endl << "pass : " << std::endl;
     this->message = message;
         if (strncmp("LIST", message.c_str(), 4) == 0) {
         check = parse_list_command(message, server);
@@ -112,7 +112,7 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
         check = check_Error_Space(this->command);
         return (check);
     }
-    if (this->message.find(' ') != std:: string:: npos)
+    if (this->message.find(' ') != std:: string:: npos )
         this->message = handle_space(this->message, this->command);
     check = check_Password_Space(this->params.size(), this->command, this->message, password);
     if (check_upper(this->command))
@@ -137,18 +137,20 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
     if (check != 0 && check != 13 && check != 14)
         this->params.erase(this->params.end() - 1);
     }
-    std::cout << "ooooo\n"; 
     return (check);
 }
 
 int Message:: check_my_vector(std:: string request, Server& server)
 {
    int check;
+
     check = 0;
 
+    std::cout << this->get_client().get_nick_name() << " soket : " << this->get_socket() <<std::endl;
     std::cout << "cmd: " << this->command << std::endl;
     if (this->command == "NICK")
     {
+        std::string old_nick = this->get_client().get_nick_name();
         if (this->message.empty())
             return (461);
         check = client.parse_nickname(request, this->enter);
@@ -166,23 +168,32 @@ int Message:: check_my_vector(std:: string request, Server& server)
         check = channel.parse_channel(request, this->channel);
         if (check == 0){
             if (!server.channel_exists(this->channel.get_channel_name())) {
-                this->channel.add_admin(this->client.get_nick_name());
+                this->channel.add_admin_to_list(this->socket);
                 server.add_new_channel(this->channel);
-                server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
+                server.add_user_to_channel(this->socket, this->channel.get_channel_name());
                 server.send_join_message(this->client.get_nick_name(), this->channel.get_channel_name());
                 server.send_channel_users_list(this->channel.get_channel_name(), *this);
+                add_channel_to_my_list(this->channel.get_channel_name());
+                this->channels[this->channel.get_channel_name()].add_admin_to_list(this->socket);
             }
             else {
+                std::cout << "------------------------------------------------------------" << server.get_channel(this->channel.get_channel_name()).is_banned(this->socket) << std::endl;
+                if (server.get_channel(this->channel.get_channel_name()).is_banned(this->socket))
+                    return (474);
+                std::cout << "curent channel size : " << server.get_channel(this->channel.get_channel_name()).get_users_list().size() << std::endl;
+                if (server.get_channel(this->channel.get_channel_name()).get_users_list().size() + 1 > server.get_channel(this->channel.get_channel_name()).get_limit() )
+                    return (471);
                 if (this->channel.get_channel_password() == server.get_channel_password(this->channel.get_channel_name())) {
-                if (server.user_exist_in_channel(this->client.get_nick_name(), this->channel.get_channel_name()))
+                if (server.user_exist_in_channel(this->get_socket(), this->channel.get_channel_name()))
                     return (462);
-                    server.add_user_to_channel(this->client.get_nick_name(), this->channel.get_channel_name());
+                    server.add_user_to_channel(this->socket, this->channel.get_channel_name());
                     server.send_join_message(this->client.get_nick_name(), this->channel.get_channel_name());
                     server.send_channel_users_list(this->channel.get_channel_name(), *this);
                     server.send_topic_message_for_new_members(this->socket, this->channel.get_channel_name());
+                    add_channel_to_my_list(this->channel.get_channel_name());
                 }
                 else {
-                    check = 464;
+                    return (464);
                 }
             }
             this->add_a_channel_to_list(this->channel.get_channel_name());
@@ -191,6 +202,7 @@ int Message:: check_my_vector(std:: string request, Server& server)
     }
     else if (this->command == "PRIVMSG")
     {
+        std::cout << "PRIVMSG kan hna be3da 3el 2a9al" << std::endl;
         if (request[request.find(' ') + 1] == '#')
         {
             std::cout << "channel message." << std::endl;
@@ -206,6 +218,14 @@ int Message:: check_my_vector(std:: string request, Server& server)
     }   
     else if (this->command == "NOTICE")
     {
+        std::string tmp;
+        if (request.find(' ') != std::string::npos) {
+            tmp = request.substr(request.find(' ') + 1);
+            if (tmp[0] == '#') {
+                check = parse_notice_for_channel(tmp, server);
+                return (check);
+            }
+        }
         if (client.get_nick_name().size() != 0 && client.get_user_name().size())
         {
             check = parse_private_message(request);
@@ -219,6 +239,11 @@ int Message:: check_my_vector(std:: string request, Server& server)
         check = parse_part_command(request, server);
         return (check);
     }
+    else if (this->command == "BOT")
+    {
+        check = parse_bot_command(request, server);
+        return (check);
+    }
     else if (this->command == "INVITE")
     {
         check = parse_invite_command(request, server);
@@ -230,11 +255,8 @@ int Message:: check_my_vector(std:: string request, Server& server)
         return (check);
     }
     else if (this->command == "MODE") {
-    
       check =  parse_Mode_command(request, server);
-      return (check);
     }
-   check = send_Message_identification(check);
    return (check);
 }
 
@@ -294,11 +316,14 @@ int Message:: check_Error_Space(std:: string command)
     if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos
         || command.find("JOIN") != std:: string:: npos || command.find("PART") != std:: string:: npos
         || command.find("MODE") != std:: string:: npos || command.find("KICK") != std:: string:: npos
-        || command.find("TOPIC") != std:: string:: npos || command.find("INVITE") != std:: string:: npos)
+        || command.find("TOPIC") != std:: string:: npos || command.find("INVITE") != std:: string:: npos
+        || command.find("BOT") != std:: string:: npos) {
+        return check = 461;
         {
             if (command.find("PASS") != std:: string:: npos || command.find("USER") != std:: string:: npos || command.find("JOIN") != std:: string:: npos)
                 check = 461;
         }
+    }
     else if (command.find("NICK") != std:: string:: npos)
         check = 431;
     return (check);
@@ -317,24 +342,25 @@ int Message:: check_message(std:: string command)
     return (check);
 }
 
-int Message:: send_Message_identification(int check)
+int Message:: send_Message_identification()
 {
     std:: string message;
+    int check;
     char hostname[256];
     char time_str[11];
     std:: time_t    now = std::time(NULL);
     std:: tm    *local_time = std:: localtime(&now);
 
+    check = 0;
     std::strftime(time_str, sizeof(time_str), "%d/%m/%Y", local_time);
     gethostname(hostname, sizeof(hostname));
     if (client.get_nick_name().size() != 0 && client.get_user_name().size() != 0 && this->enter == false)
     {
-        this->hostname = std::string(hostname);
         this->welcome_message = ":irc.1337.ma 001 " + client.get_nick_name() + " : Welcome to Internet Chat Relay";
         this->host_message = ": 002 " + client.get_nick_name() + " Your Host is " + std:: string(hostname) + ", running version 1.0";
         this->server_message = ": 003 " + client.get_nick_name() + " Ther server was created on " + std:: string(time_str);
         this->enter = true;
-        return (check = 13);
+        return (13);
     }
     return (check);
 }
@@ -419,7 +445,7 @@ bool Message:: check_command(std:: string command)
     || command.find("USER") != std:: string :: npos || command.find("PRIVMSG") != std:: string :: npos || command.find("NOTICE") != std:: string :: npos \
     || command.find("JOIN") != std:: string :: npos || command.find("PART") != std:: string :: npos || command.find("MODE") != std:: string :: npos\
     || command.find("KICK") != std:: string :: npos || command.find("LIST") != std:: string :: npos || command.find("TOPIC") != std:: string:: npos\
-    || command.find("INVITE") != std:: string:: npos)
+    || command.find("INVITE") != std:: string:: npos || command.find("BOT") != std:: string:: npos)
         return false;
     return true;
 }
@@ -444,12 +470,14 @@ int Message::parse_channel_message(std::string request, Server& server) {
     }
     else
         channel_name = channel_name.substr(1, channel_name.find('\r'));
-    if (!server.user_exist_in_channel(this->client.get_nick_name(), channel_name))
+    if (!server.user_exist_in_channel(this->get_socket(), channel_name))
         return (404);
     if (server.channel_exists(channel_name) == true)
     {
-        server.send_message_to_channel(channel_name, message,this->client.get_nick_name());
+        server.send_message_to_channel(channel_name, message,this->client.get_nick_name(), this->socket);
     }
+    else
+        return (403);
     return (0);
 }
 
@@ -470,9 +498,9 @@ int Message::parse_part_command(std::string request, Server& server) {
     else {
         channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find('\r') - 1);        
     }
-    if (server.user_exist_in_channel(this->client.get_nick_name(), channel_name)) {
+    if (server.user_exist_in_channel(this->socket, channel_name)) {
         server.send_part_message_to_channel(channel_name, message, this->client.get_nick_name());
-        server.remove_user_from_channel(this->client.get_nick_name(), channel_name);
+        server.remove_user_from_channel(this->socket, channel_name);
     }
     else
         return (403);
@@ -493,10 +521,12 @@ int Message::parse_kick_command(std::string request, Server& server) {
                 channel_name = channel_name.substr(0, channel_name.find(' '));
                 kicked_user = kicked_user.substr(0,kicked_user.find(' '));
                 if (server.channel_exists(channel_name)) {
-                    if (server.user_exist_in_channel(kicked_user, channel_name) && server.user_exist_in_channel(this->client.get_nick_name(), channel_name)) {
-                        if (server.is_admin(channel_name, this->client.get_nick_name())) {
+                    if (server.user_exist_in_channel(server.get_user_socket(kicked_user), channel_name) && server.user_exist_in_channel(this->socket, channel_name)) {
+                        if (server.is_admin(channel_name, this->socket)) {
                             server.send_kick_message_to_channel(channel_name, kicked_user, reason, this->client.get_nick_name());
-                            server.remove_user_from_channel(kicked_user, channel_name);
+                            server.remove_user_from_channel(server.get_user_socket(kicked_user), channel_name);
+                            if (server.get_channel(channel_name).is_admin(server.get_user_socket(kicked_user)))
+                                server.get_channel(channel_name).remove_admin(server.get_user_socket(kicked_user));
                         }
                         else
                             return (482);
@@ -510,10 +540,12 @@ int Message::parse_kick_command(std::string request, Server& server) {
             else {
                 channel_name = channel_name.substr(0, channel_name.find(' '));
                 if (server.channel_exists(channel_name)) {
-                    if (server.user_exist_in_channel(kicked_user, channel_name) && server.user_exist_in_channel(this->client.get_nick_name(), channel_name)) {
-                        if (server.is_admin(channel_name, this->client.get_nick_name())) {
+                    if (server.user_exist_in_channel(server.get_user_socket(kicked_user), channel_name) && server.user_exist_in_channel(this->socket, channel_name)) {
+                        if (server.is_admin(channel_name, this->socket)) {
                             server.send_kick_message_to_channel(channel_name, kicked_user, "", this->client.get_nick_name());
-                            server.remove_user_from_channel(kicked_user, channel_name);
+                            server.remove_user_from_channel(server.get_user_socket(kicked_user), channel_name);
+                            if (server.get_channel(channel_name).is_admin(server.get_user_socket(kicked_user)))
+                                server.get_channel(channel_name).remove_admin(server.get_user_socket(kicked_user));
                         }
                         else
                             return (482);
@@ -584,7 +616,7 @@ int Message::parse_topic(std::string request, Server& server){
         return (461);
     second_param = second_param.substr(1, second_param.find('\r'));
     if (server.channel_exists(first_param)) {
-        if (server.is_admin(first_param ,this->client.get_nick_name())) {
+        if (server.is_admin(first_param ,this->socket)) {
             server.send_topic_message(first_param, second_param);
             server.set_topic_to_channel(first_param, second_param);
         }
@@ -620,9 +652,9 @@ int Message::parse_invite_command(std::string request, Server& server) {
             return (461);
         first = first.substr(0, first.find(' '));
         if (server.channel_exists(second)) {
-            if (server.user_exist_in_channel(first, second))
+            if (server.user_exist_in_channel(server.get_user_socket(first), second))
                 return (443);
-            server.get_channel(second).add_user_to_invite_qeue(first);
+            server.get_channel(second).add_user_to_invite_qeue(server.get_user_socket(first));
             server.send_invite_message(first, this->client.get_nick_name(), second);
         }
     }
@@ -631,33 +663,65 @@ int Message::parse_invite_command(std::string request, Server& server) {
     return (0);
 }
 
+int Message::parse_bot_command(std::string request, Server& server) {
+    std::string param;
+    if (request.find(' ') != std::string::npos) {
+        param = request.substr(request.find(' ') + 1);
+        if (!this->channel.is_empty(param)) {
+            param = param.substr(0, param.find('\r'));
+            if (param == "TIME")
+                server.print_current_time(this->get_socket());
+            else if (param == "LOGTIME")
+                server.send_a_message(this->get_socket(), this->get_logtime());
+            else
+                return (461);
+        }
+        else
+            return (461);
+    }
+    return (0);
+}
+
+void    Message::set_time() {
+    this->_time = std::time(NULL);
+}
+
+std::string    Message::get_logtime() {
+    std::string log;
+    double      seconds;
+    std::time_t      local_time;
+
+    local_time = std::time(nullptr);
+    seconds = difftime(local_time, this->_time);
+    log = ":BOT NOTICE logtime : " + std::to_string(static_cast<int>(seconds / 60)) + " min, " + std::to_string(static_cast<int>(((seconds / 60) - static_cast<int>(seconds / 60)) * 60)) + " sec.\r\n";
+    return (log);
+}
+
 int Message::parse_Mode_command(std::string request,Server& server)
 {
     std::string channel_name;
     std::string mode;
     std::string param;
+
     if (request.find('+') == std::string::npos && request.find('-') == std::string::npos)
         return (461);
     if (request.find('+') != std::string::npos && request.find('-') != std::string::npos)
         return (472);
     if (request.find(' ') != std::string::npos && request.find(' ') + 1 != std::string::npos)// find #
     {
-
         channel_name = request.substr(request.find('#') + 1, request.find(' ', request.find('#')) - request.find('#') - 1);
-
-        std::cout <<"adam " <<request << std::endl;
-        std::cout << "channel " << channel_name << std::endl;
-
         if (request.find('+') != std::string::npos)
             mode = request.substr(request.find('+'));
         else if (request.find('-') != std::string::npos)
             mode  = request.substr(request.find('-'));
         if (mode.find(' ') != std::string::npos && mode.find(' ') + 1 != std::string::npos)
-        {  
+        { 
             param = mode.substr(mode.find(' ') + 1);
             mode  = mode.substr(0, mode.find(' '));
-            std::cout << "hahowa lmode dine dimah :" << mode << std::endl;
             std::cout <<"hahowa param dine dimah :" <<"param " << param << std::endl;
+            std::cout << "hahowa lmode dine dimah :" << mode << std::endl;
+            if (!server.channel_exists(channel_name))
+                return (403);
             if(mode[0] == '+')
                 return (add_mode_to_channel(mode, channel_name,param, server));
             else if(mode[0] == '-')
@@ -665,7 +729,9 @@ int Message::parse_Mode_command(std::string request,Server& server)
             else 
                 return (461); 
         }
-        if(mode[0] == '+')
+        if (!server.channel_exists(channel_name))
+            return (403);
+        if (mode[0] == '+')
             return (add_mode_to_channel(mode, channel_name, NULL,server));
         else if(mode[0] == '-')
             return (remove_mode_from_channel(mode, channel_name,NULL, server));
@@ -675,13 +741,11 @@ int Message::parse_Mode_command(std::string request,Server& server)
     return (461); 
 }
 
-
-
-int Message::check_mode (std::string mode, std::string channel_name,Server &server)
+int Message::check_mode(std::string mode, std::string channel_name,Server &server)
 {
     size_t i = 1;
     std::cout << "Checking mode hikigulog;::::::: " << mode << std::endl;
-    if (server.channel_exists(channel_name) && server.user_exist_in_channel(channel_name,this->client.get_nick_name()))
+    if (server.channel_exists(channel_name) && server.user_exist_in_channel(this->socket, channel_name))
     {
         while (i < mode.length())
         {
@@ -693,33 +757,28 @@ int Message::check_mode (std::string mode, std::string channel_name,Server &serv
     }
     else
         return (403);
+    return (0);
 }
-
 
 int Message::add_mode_to_channel(std::string mode, std::string channel_name,std::string param,Server &server)
 {
-    
-    size_t i = 0;
-
-    if (i < mode.length())
-        mode = mode.substr(i + 1);
-    std::cout << "here is add_mode to channel cout of mode :"<< mode << std::endl;
+    mode = mode.substr(1);
     if (!check_mode (mode, channel_name,server))
         return (472);
     if (param.empty())
     {
-        server.get_channel (channel_name).set_modes(mode,NULL);
+        server.get_channel(channel_name).set_modes(mode,"", server.get_user_socket(param));
     }
     else
-        server.get_channel (channel_name).set_modes(mode,param);
-
+        server.get_channel (channel_name).set_modes(mode,param, server.get_user_socket(param));
+    std::cout << "here is add_mode to channel cout of mode :"<< mode << std::endl;
     return (0);
 }
 
 int Message::remove_mode_from_channel(std::string mode, std::string channel_name,std::string param,Server& server)
 {
-    std::cout << param << "zebbbbbbiiiiii2\n" << std::endl;
-    size_t i = 0;
+    (void)param;
+        size_t i = 0;
     while (mode[i] == '-')
         i++;
     if (i < mode.length())
@@ -729,5 +788,33 @@ int Message::remove_mode_from_channel(std::string mode, std::string channel_name
      if (!check_mode (mode, channel_name,server))
         return (472);
     server.get_channel (channel_name).unset_modes(mode);
+    return (1);
+}
+
+int Message::parse_notice_for_channel(std::string request, Server& server) {
+    std::string channel_name;
+    std::string message;
+
+    if (request.find(' ') == std::string::npos)
+        return (461);
+	channel_name = request.substr(1, request.find(' ') - 1);
+	message = request.substr(request.find(' ') + 1, request.find('\r'));
+	if (this->channel.is_empty(channel_name) || this->channel.is_empty(message))
+		return (461);
+	if (!server.channel_exists(channel_name))
+		return (403);
+    if (server.is_admin(channel_name, this->socket))
+	    server.send_notice_message_to_channel(channel_name, message, this->client.get_nick_name());
+    else
+        return (482);
     return (0);
+}
+
+void    Message::add_channel_to_my_list(std::string channel) {
+    std::cout << "added : " + channel << "for : " << this->client.get_nick_name() << std::endl;
+    this->joined_channels.push_back(channel);
+}
+
+std::vector <std::string>  Message::get_my_channels_list() {
+    return (this->Mychannels);
 }

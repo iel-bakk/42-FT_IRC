@@ -28,10 +28,12 @@ private:
     std:: string message_to_send;
     std:: string notice_private;
     std:: vector<std:: string> params;
+    std:: vector<std:: string> Mychannels;
     Client client;
     Channel channel;
     std::vector<std::string> joined_channels;
     std::map<std::string, Channel> channels;
+    time_t _time;
 
 public :
     Message();
@@ -55,7 +57,7 @@ public :
     int				check_upper(std:: string command);
     int				check_my_vector(std:: string request, Server& server);
     int				check_Error_Space(std:: string command);
-    int				send_Message_identification(int check);
+    int				send_Message_identification();
     int				check_Password_Space(int size, std:: string command, std:: string message, std:: string password);
     int				parse_private_message(std:: string message);
     std::vector<std::string> create_vector(void);
@@ -71,11 +73,16 @@ public :
     bool            check_list_param(std::string param);
     int             parse_topic(std::string request, Server& server);
     int             parse_invite_command(std::string request, Server& server);
-
-    int parse_Mode_command(std::string request, Server& server);
-    int check_mode (std::string mode, std::string channel_name,Server& server);
-    int add_mode_to_channel(std::string,std::string,std::string,Server&);
-    int remove_mode_from_channel(std::string,std::string,std::string,Server&);
+    int             parse_bot_command(std::string request, Server& server);
+    void            set_time();
+    std::string     get_logtime();
+    int             parse_notice_for_channel(std::string request, Server& server);
+    int             check_mode (std::string mode, std::string channel_name,Server &server);
+    int             parse_Mode_command(std::string request, Server& server);
+    int             add_mode_to_channel(std::string,std::string,std::string,Server&);
+    int             remove_mode_from_channel(std::string,std::string,std::string,Server&);
+    void            add_channel_to_my_list(std::string channel);
+    std::vector<std::string> get_my_channels_list();
 };
 
 #endif

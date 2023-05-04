@@ -28,3 +28,4 @@ make the one that creates the channel it's operator.
                   ERR_NOTOPLEVEL and ERR_WILDTOPLEVEL are errors that
                   are returned when an invalid use of
                   "PRIVMSG $<server>" or "PRIVMSG #<host>" is attempted.
+creat a channel list that a user have joined so when changes he's name it gets modified in the channel list

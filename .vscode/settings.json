@@ -1,12 +1,26 @@
 {
     "files.associations": {
+<<<<<<< HEAD
+<<<<<<< HEAD
         "*.excalidraw": "json",
         "*.excalidrawlib": "json",
+=======
+>>>>>>> my_branch
+=======
+>>>>>>> my_branch
         "__bit_reference": "cpp",
         "__config": "cpp",
         "__debug": "cpp",
         "__errc": "cpp",
         "__functional_base": "cpp",
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        "__hash_table": "cpp",
+>>>>>>> my_branch
+=======
+        "__hash_table": "cpp",
+>>>>>>> my_branch
         "__locale": "cpp",
         "__mutex_base": "cpp",
         "__node_handle": "cpp",
@@ -17,11 +31,29 @@
         "__tree": "cpp",
         "__tuple": "cpp",
         "algorithm": "cpp",
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        "array": "cpp",
+>>>>>>> my_branch
+=======
+        "array": "cpp",
+>>>>>>> my_branch
         "atomic": "cpp",
         "bit": "cpp",
         "bitset": "cpp",
         "cctype": "cpp",
         "chrono": "cpp",
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        "cmath": "cpp",
+        "complex": "cpp",
+>>>>>>> my_branch
+=======
+        "cmath": "cpp",
+        "complex": "cpp",
+>>>>>>> my_branch
         "cstdarg": "cpp",
         "cstddef": "cpp",
         "cstdint": "cpp",
@@ -48,6 +80,14 @@
         "optional": "cpp",
         "ostream": "cpp",
         "ratio": "cpp",
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        "sstream": "cpp",
+>>>>>>> my_branch
+=======
+        "sstream": "cpp",
+>>>>>>> my_branch
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "string": "cpp",
@@ -56,6 +96,14 @@
         "tuple": "cpp",
         "type_traits": "cpp",
         "typeinfo": "cpp",
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        "unordered_map": "cpp",
+>>>>>>> my_branch
+=======
+        "unordered_map": "cpp",
+>>>>>>> my_branch
         "utility": "cpp",
         "vector": "cpp"
     }
