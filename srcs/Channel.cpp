@@ -4,6 +4,8 @@ Channel:: Channel()
 {
     set_channels_modes();
     limit_ban_list = 10;
+    limit = 2;
+    limite = false;
 }
 
 Channel:: ~Channel()
@@ -256,7 +258,6 @@ int Channel::execute_mode(char c,std::string param, int user_socket)
             if (!param.empty())
             {
                 if (user_is_in_channels(user_socket)) {
-                    std::cout << "rah rah rah rah rah " + this->get_channel_name() << std::endl;
                     this->admins.push_back(user_socket);
                     return (0);
                 }
@@ -309,11 +310,6 @@ int Channel::add_to_ban_list(int user)
             return (478);
         this->ban_list.push_back(user);
         remove_user_from_channel_list(user);
-        // std::vector<std::string>::iterator it ;
-        // for (it = ban_list.begin(); it != ban_list.end(); it++)
-        // {
-        //     std::cout << *it << std::endl;
-        // }
         return (0);
     }
     else
@@ -346,4 +342,7 @@ bool           Channel::is_banned(int user)
         std::cout << "was here to confirm is banned" << std::endl;
     }
     return (false);
+}
+size_t  Channel::get_limit() {
+    return (this->limit);
 }

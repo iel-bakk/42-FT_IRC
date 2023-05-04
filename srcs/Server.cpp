@@ -176,7 +176,7 @@ int Server:: HandleError(int error_replies, int sockfd)
     int num = 0;
     std:: string handle_message;
     std:: string _message;
-    std::cout << "hahowa sock_fd ["<<  sockfd << "]" << std::endl;
+
     switch (error_replies)
     {
         case 10:
@@ -614,35 +614,6 @@ void    Server::send_notice_message_to_channel(std::string channel_name, std::st
             send_a_message(it->second.get_socket(), msg);
     }
 }
-
-// void    Server::change_user_info(std::string username, std::string new_name)
-// {
-//     std::map<int, Message>::iterator it;
-
-//         std::cout << "here is the username : " + new_name + "///////" << std::endl; 
-//     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
-//         if (it->second.get_client().get_nick_name() == new_name) {
-//             // modify_channel_data(username, new_name);
-//             break ;
-//         }
-//     }
-// }
-
-// void		Server::modify_channel_data(int user, std::string new_name) {
-//     std::map<std::string, Channel>::iterator it;
-
-//     for (it = this->channels.begin(); it != this->channels.end(); it++) {
-//         if (it->second.user_is_in_channels(user)) {
-//             it->second.add_user_to_list(new_name);
-//             it->second.remove_user_from_channel_list(username);
-//                 std::cout << "got here " << std::endl;
-//             if (it->second.is_admin(username)) {
-//                 it->second.add_admin(new_name);
-//                 it->second.remove_admin(username);
-//             }
-//         }
-//     }
-// }
 
 int Server::get_user_socket(std::string name) {
     std::map<int, Message>::iterator it;

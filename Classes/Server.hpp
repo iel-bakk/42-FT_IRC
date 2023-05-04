@@ -74,7 +74,7 @@ class Server
 		void        send_kick_message_to_channel(std::string channel_name, std::string kicked_user, std::string reason, std::string kicker);
 		bool        is_admin(std::string channel_name, int user);
 		void        send_channels_list(int socket, std::string search, std::string user);
-		Channel&		get_channel(std::string channel_name);
+		Channel&	get_channel(std::string channel_name);
     	void        send_topic_message(std::string channel, std::string topic);
 		void		send_topic_message_for_new_members(int socket, std::string channel);
 		void		set_topic_to_channel(std::string channel, std::string topic);
@@ -84,8 +84,6 @@ class Server
 		void        send_message_to_channel(std::string channel_name, std::string message, std::string client, int socket);
 		void        send_leave_message_to_channel(std::string channel_name, std::string client);
 		void		send_notice_message_to_channel(std::string channel_name, std::string message, std::string client);
-		// void		change_user_info(std::string username, std::string new_name);
-		// void		modify_channel_data(std::string username, std::string new_name);
         int			display_error(int sockfd);
         int			send_private_message(int sockfd);
 		int			get_user_socket(std::string name);

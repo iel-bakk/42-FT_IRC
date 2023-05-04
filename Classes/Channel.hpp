@@ -53,6 +53,7 @@ public:
     bool                        is_banned(int);
     std::vector <std::string>   get_my_channels_list();
     int    add_admin_to_list(int socket);
+    size_t                      get_limit();
 };
 
 #endif

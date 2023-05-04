@@ -177,7 +177,10 @@ int Message:: check_my_vector(std:: string request, Server& server)
                 this->channels[this->channel.get_channel_name()].add_admin_to_list(this->socket);
             }
             else {
-                if (this->channel.is_banned(this->socket))
+                if (server.get_channel(this->channel.get_channel_name()).is_banned(this->socket))
+                    return (474);
+                std::cout << "curent channel size : " << server.get_channel(this->channel.get_channel_name()).get_users_list().size() << std::endl;
+                if (server.get_channel(this->channel.get_channel_name()).get_users_list().size() + 1 > server.get_channel(this->channel.get_channel_name()).get_limit() )
                     return (474);
                 if (this->channel.get_channel_password() == server.get_channel_password(this->channel.get_channel_name())) {
                 if (server.user_exist_in_channel(this->get_socket(), this->channel.get_channel_name()))
@@ -521,6 +524,8 @@ int Message::parse_kick_command(std::string request, Server& server) {
                         if (server.is_admin(channel_name, this->socket)) {
                             server.send_kick_message_to_channel(channel_name, kicked_user, reason, this->client.get_nick_name());
                             server.remove_user_from_channel(server.get_user_socket(kicked_user), channel_name);
+                            if (server.get_channel(channel_name).is_admin(server.get_user_socket(kicked_user)))
+                                server.get_channel(channel_name).remove_admin(server.get_user_socket(kicked_user));
                         }
                         else
                             return (482);
@@ -538,6 +543,8 @@ int Message::parse_kick_command(std::string request, Server& server) {
                         if (server.is_admin(channel_name, this->socket)) {
                             server.send_kick_message_to_channel(channel_name, kicked_user, "", this->client.get_nick_name());
                             server.remove_user_from_channel(server.get_user_socket(kicked_user), channel_name);
+                            if (server.get_channel(channel_name).is_admin(server.get_user_socket(kicked_user)))
+                                server.get_channel(channel_name).remove_admin(server.get_user_socket(kicked_user));
                         }
                         else
                             return (482);
@@ -702,9 +709,6 @@ int Message::parse_Mode_command(std::string request,Server& server)
     if (request.find(' ') != std::string::npos && request.find(' ') + 1 != std::string::npos)// find #
     {
         channel_name = request.substr(request.find('#') + 1, request.find(' ', request.find('#')) - request.find('#') - 1);
-        std::cout <<"adam " <<request << std::endl;
-        std::cout << "channel " << channel_name << std::endl;
-
         if (request.find('+') != std::string::npos)
             mode = request.substr(request.find('+'));
         else if (request.find('-') != std::string::npos)
