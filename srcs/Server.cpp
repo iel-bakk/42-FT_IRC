@@ -232,6 +232,9 @@ int Server:: HandleError(int error_replies, int sockfd)
         case 462:
             num = write(sockfd, "462 ERR_ALREADYREGISTRED USER :Unauthorized command (already registered)\r\n", 74);
             break;
+        case 471:
+            num = write(sockfd, "471 ERR_CHANNELISFULL <channel> :Cannot join channel (+l)\r\n",59);
+            break;
         case 472:
             num = write(sockfd, "472 ERR_UNKNOWNMODE :is unknown mode char to me for this channel\r\n",66);
             break ;

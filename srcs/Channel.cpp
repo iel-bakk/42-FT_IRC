@@ -4,7 +4,7 @@ Channel:: Channel()
 {
     set_channels_modes();
     limit_ban_list = 10;
-    limit = 2;
+    limit = 10;
     limite = false;
 }
 
@@ -304,18 +304,16 @@ bool Channel::user_is_in_channels(int socket)
 
 int Channel::add_to_ban_list(int user)
 {
+    if (limit_ban_list <= ban_list.size())
+        return (478);
     if (user_is_in_channels(user))
     {
-        if (limit_ban_list <= ban_list.size())
-            return (478);
         this->ban_list.push_back(user);
         remove_user_from_channel_list(user);
         return (0);
     }
     else
     {
-        if (limit_ban_list <= ban_list.size())
-            return (478);
        this->ban_list.push_back(user);
        return (0);
     }

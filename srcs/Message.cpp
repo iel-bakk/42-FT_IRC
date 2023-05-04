@@ -177,11 +177,12 @@ int Message:: check_my_vector(std:: string request, Server& server)
                 this->channels[this->channel.get_channel_name()].add_admin_to_list(this->socket);
             }
             else {
+                std::cout << "------------------------------------------------------------" << server.get_channel(this->channel.get_channel_name()).is_banned(this->socket) << std::endl;
                 if (server.get_channel(this->channel.get_channel_name()).is_banned(this->socket))
                     return (474);
                 std::cout << "curent channel size : " << server.get_channel(this->channel.get_channel_name()).get_users_list().size() << std::endl;
                 if (server.get_channel(this->channel.get_channel_name()).get_users_list().size() + 1 > server.get_channel(this->channel.get_channel_name()).get_limit() )
-                    return (474);
+                    return (471);
                 if (this->channel.get_channel_password() == server.get_channel_password(this->channel.get_channel_name())) {
                 if (server.user_exist_in_channel(this->get_socket(), this->channel.get_channel_name()))
                     return (462);
@@ -719,6 +720,8 @@ int Message::parse_Mode_command(std::string request,Server& server)
             mode  = mode.substr(0, mode.find(' '));
             std::cout <<"hahowa param dine dimah :" <<"param " << param << std::endl;
             std::cout << "hahowa lmode dine dimah :" << mode << std::endl;
+            if (!server.channel_exists(channel_name))
+                return (403);
             if(mode[0] == '+')
                 return (add_mode_to_channel(mode, channel_name,param, server));
             else if(mode[0] == '-')
@@ -726,6 +729,8 @@ int Message::parse_Mode_command(std::string request,Server& server)
             else 
                 return (461); 
         }
+        if (!server.channel_exists(channel_name))
+            return (403);
         if (mode[0] == '+')
             return (add_mode_to_channel(mode, channel_name, NULL,server));
         else if(mode[0] == '-')
