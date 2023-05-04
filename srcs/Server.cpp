@@ -185,9 +185,6 @@ int Server:: HandleError(int error_replies, int sockfd)
         case 11:
             close_socket(this->file_vectors[sockfd].get_socket());
             break;
-        case 12:
-            std:: cout << "Invalid Command" << std:: endl;
-            break;
         case 13:
             num = write_long_message(sockfd);
             break;
@@ -206,6 +203,9 @@ int Server:: HandleError(int error_replies, int sockfd)
         case 412:
             num = write(sockfd, "412 ERR_NOTEXTTOSEND :No text to send\r\n", 39);
             break;
+        case 421 :
+            num = write(sockfd, "421 ERR_UNKNOWNCOMMAND :Unknown command\r\n", 41);
+            break ;
         case 431:
             num = write(sockfd, "431 ERR_NONICKNAMEGIVEN:No nickname given\r\n", 43);
             break;
