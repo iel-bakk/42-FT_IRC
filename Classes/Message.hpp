@@ -85,6 +85,7 @@ public :
     void            add_hostname(std::string);
     std::string     get_host_name(void);
     std::vector<std::string> get_my_channels_list();
+    void            erase_user(void);
 };
 
 #endif

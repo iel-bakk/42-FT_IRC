@@ -88,6 +88,7 @@ class Server
         int			display_error(int sockfd);
         int			send_private_message(int sockfd);
 		int			get_user_socket(std::string name);
+		void		check_Nick_send_message(int sock, Message *new_user);
 };
 
 #endif

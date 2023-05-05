@@ -168,6 +168,37 @@ void Server:: read_write_socket(int sockfd, int *num_fds, Message *new_user)
         std:: cout << "Error: Writing From Socket" << std:: endl;
         exit(1);
     }
+    check_Nick_send_message(sockfd, new_user);
+}
+
+void Server:: check_Nick_send_message(int sock, Message *new_user)
+{
+    int check;
+    int num;
+    
+    std:: map<int, Message>:: iterator it = this->file_vectors.find(sock);
+    std:: map<int, Message>:: iterator it_incre = this->file_vectors.begin();
+    if (it != this->file_vectors.end() && it != it_incre)
+    {
+        if (new_user->get_my_user().size() != 0)
+        {
+            if (it_incre != this->file_vectors.end())
+            {
+                for (; it_incre != it; ++it_incre)
+                {
+                    Message value = it_incre->second;
+                    if (value.get_my_user() == new_user->get_my_user())
+                    {
+                        std:: string _message = "436 ERR_NICKCOLLISION " + new_user->get_my_user() +  " :Nickname collision KILL\r\n";
+                        num = display_message(new_user->get_socket(), _message);
+                        new_user->erase_user();
+                        return ;
+                    }
+                }
+            }
+        }
+    }
+    check = HandleError(new_user->send_Message_identification(), sock);  
 }
 
 void Server:: send_socket(void)
