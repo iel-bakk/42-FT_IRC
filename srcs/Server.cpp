@@ -407,6 +407,9 @@ void    Server::send_message_to_channel(std::string channel_name,std::string mes
     std::string msg;
 
     list = this->channels[channel_name].get_users_list();
+    if (message[0] == '#')
+        message = message.substr(message.find(' '), message.find('\r'));
+    std::cout << "......." << message << std::endl;
     msg = ":" + client +  " PRIVMSG #" + channel_name + " :" + message + "\r\n";
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
     {
