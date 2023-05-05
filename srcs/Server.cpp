@@ -146,7 +146,6 @@ void Server:: read_write_socket(int sockfd, int *num_fds, Message *new_user)
     bzero(buffer, 511);
     n = recv(sockfd, buffer, 510, 0);
     buffer[n] = 0;
-    std::cout << buffer << std::endl;
     check = 0;
     if (n < 0)
     {
