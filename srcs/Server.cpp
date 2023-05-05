@@ -145,6 +145,8 @@ void Server:: read_write_socket(int sockfd, int *num_fds, Message *new_user)
 
     bzero(buffer, 511);
     n = recv(sockfd, buffer, 510, 0);
+    buffer[n] = 0;
+    std::cout << buffer << std::endl;
     check = 0;
     if (n < 0)
     {
@@ -333,7 +335,7 @@ int Server:: send_private_message(int sockfd)
     {
         if (this->file_vectors[i].get_my_user() == this->file_vectors[sockfd].get_user_to_send())
         {
-            message = ":" + this->file_vectors[sockfd].get_my_user() + this->file_vectors[sockfd].get_notice_private() + this->file_vectors[i].get_my_user() + " :" + this->file_vectors[sockfd].get_message_to_send() + "\r\n";
+            message = ":" + this->file_vectors[sockfd].get_my_user() + this->file_vectors[sockfd].full_host() + this->file_vectors[sockfd].get_notice_private() + this->file_vectors[i].get_my_user() + " :" + this->file_vectors[sockfd].get_message_to_send() + "\r\n";
             num = display_message(this->file_vectors[i].get_socket(), message);
             return (num);
         }
@@ -434,7 +436,7 @@ void    Server::send_message_to_channel(std::string channel_name,std::string mes
     list = this->channels[channel_name].get_users_list();
     if (message[0] == '#')
         message = message.substr(message.find(' '), message.find('\r'));
-    msg = ":" + client +  " PRIVMSG #" + channel_name + " :" + message + "\r\n";
+    msg = ":" + client + this->file_vectors[get_user_socket(client)].full_host() + " PRIVMSG #" + channel_name + " :" + message + "\r\n";
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
     {
         if (find(list.begin(), list.end(), it->second.get_socket()) != list.end() && it->second.get_socket() != socket)
@@ -465,7 +467,7 @@ void    Server::send_join_message(std::string username, std::string channel_name
     std::string join_message;
 
     list = this->channels[channel_name].get_users_list();
-    msg = ":" + username + " JOIN #" + channel_name + "\r\n";
+    msg = ":" + username + this->file_vectors[get_user_socket(username)].full_host() + " JOIN #" + channel_name + "\r\n";
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
     {
         if (find(list.begin(), list.end(), it->second.get_socket()) != list.end()) {
@@ -522,9 +524,9 @@ void    Server::send_part_message_to_channel(std::string channel_name,std::strin
 
     list = this->channels[channel_name].get_users_list();
     if (message.empty())
-        msg = ":" + client + " PART #" + channel_name + "\r\n";
+        msg = ":" + client + this->file_vectors[get_user_socket(client)].full_host() + " PART #" + channel_name + "\r\n";
     else
-        msg = ":" + client + " PART #" + channel_name + " :" + message + "\r\n";
+        msg = ":" + client + this->file_vectors[get_user_socket(client)].full_host() + " PART #" + channel_name + " :" + message + "\r\n";
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
     {
         if (find(list.begin(), list.end(), it->second.get_socket()) != list.end()){
@@ -542,9 +544,9 @@ void    Server::send_kick_message_to_channel(std::string channel_name, std::stri
 
     list = this->channels[channel_name].get_users_list();
     if (!reason.empty())
-        message = ":" +  kicker + " KICK #" + channel_name + " " + kicked_user + " :" + reason + "\r\n";
+        message = ":" +  kicker + this->file_vectors[get_user_socket(kicker)].full_host() + " KICK #" + channel_name + " " + kicked_user + " :" + reason + "\r\n";
     else
-        message = ":" +  kicker + " KICK #" + channel_name + " " + kicked_user + "\r\n";
+        message = ":" +  kicker + this->file_vectors[get_user_socket(kicker)].full_host() + " KICK #" + channel_name + " " + kicked_user + "\r\n";
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++) {
         if (find(list.begin(), list.end(), it->second.get_socket()) != list.end()){
             send_a_message(it->second.get_socket(), message);

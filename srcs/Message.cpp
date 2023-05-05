@@ -722,3 +722,10 @@ void    Message::add_hostname(std::string host) {
 std::string Message::get_host_name(void) {
     return (this->hostname);
 }
+
+std::string     Message::full_host() {
+    std::string need;
+
+    need = "!~" + this->client.get_user_name().substr(0, this->client.get_user_name().find(' ')) + "@" + this->hostname;
+    return (need);
+}
