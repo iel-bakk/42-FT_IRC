@@ -4,6 +4,7 @@
 #include <ctime>
 #include <iostream>
 #include <sys/socket.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <string.h>

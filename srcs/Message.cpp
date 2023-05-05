@@ -714,3 +714,11 @@ void    Message::add_channel_to_my_list(std::string channel) {
 std::vector <std::string>  Message::get_my_channels_list() {
     return (this->Mychannels);
 }
+
+void    Message::add_hostname(std::string host) {
+    this->hostname = host;
+}
+
+std::string Message::get_host_name(void) {
+    return (this->hostname);
+}

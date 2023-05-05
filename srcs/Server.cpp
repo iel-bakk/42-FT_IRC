@@ -111,12 +111,19 @@ void Server:: accept_socket(void)
                         close (this->new_socket_fd);
                     else
                     {
+                        char host[256];
+                        int result = getnameinfo((struct sockaddr*) &this->socker_addr, sizeof(this->socker_addr), host, 256, NULL, 0, 0);
                         std:: cout << "connection accepted" << std:: endl;
                         this->fds[num_fds].fd = this->new_socket_fd;
                         this->fds[num_fds].events = POLLIN;
                         num_fds++;
                         Message my_message(this->new_socket_fd);
                         my_message.set_time();
+                        if (result == 0) {
+                            my_message.add_hostname(std::string(host));
+                        } else {
+                            std::cout << "Error getting client hostname: " << std::endl;
+                        }
                         this->file_vectors[new_socket_fd] = my_message;
                     }
                 }
@@ -400,7 +407,7 @@ void    Server::send_message_to_channel(std::string channel_name,std::string mes
     std::string msg;
 
     list = this->channels[channel_name].get_users_list();
-    msg = ":" + client + " PRIVMSG #" + channel_name + " : " + message + "\r\n";
+    msg = ":" + client +  " PRIVMSG #" + channel_name + " :" + message + "\r\n";
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
     {
         if (find(list.begin(), list.end(), it->second.get_socket()) != list.end() && it->second.get_socket() != socket)

@@ -82,6 +82,8 @@ public :
     int             add_mode_to_channel(std::string,std::string,std::string,Server&);
     int             remove_mode_from_channel(std::string,std::string,std::string,Server&);
     void            add_channel_to_my_list(std::string channel);
+    void            add_hostname(std::string);
+    std::string     get_host_name(void);
     std::vector<std::string> get_my_channels_list();
 };
 
