@@ -84,8 +84,6 @@ int Message:: parse_message(std:: string password, std:: string message, Server&
 {
     int check = 0;
 
-    std::cout << "host name : " << this->hostname << std::endl;
-    std::cout << "stoof : " << message << std::endl;
     this->message = message;
         if (strncmp("LIST", message.c_str(), 4) == 0) {
         check = parse_list_command(message, server);
@@ -146,8 +144,6 @@ int Message:: check_my_vector(std:: string request, Server& server)
 
     check = 0;
 
-    std::cout << this->get_client().get_nick_name() << " soket : " << this->get_socket() <<std::endl;
-    std::cout << "cmd: " << this->command << std::endl;
     if (this->command == "NICK")
     {
         std::string old_nick = this->get_client().get_nick_name();
@@ -198,10 +194,8 @@ int Message:: check_my_vector(std:: string request, Server& server)
     }
     else if (this->command == "PRIVMSG")
     {
-        std::cout << "PRIVMSG kan hna be3da 3el 2a9al" << std::endl;
         if (request[request.find(' ') + 1] == '#')
         {
-            std::cout << "channel message." << std::endl;
             check = parse_channel_message(request, server);
         }
         else if (client.get_nick_name().size() != 0 && client.get_user_name().size() != 0)
@@ -491,7 +485,6 @@ int Message::parse_part_command(std::string request, Server& server) {
     if (channel_name.find(':') != std::string::npos) {
         message = channel_name.substr(channel_name.find(':') + 1);
         channel_name = channel_name.substr(1, channel_name.find(' ') - 1);
-        std::cout << "." << channel_name << "." << std::endl;
     }
     else {
         channel_name = channel_name.substr(channel_name.find('#') + 1, channel_name.find('\r') - 1);        
@@ -715,7 +708,6 @@ int Message::parse_notice_for_channel(std::string request, Server& server) {
 }
 
 void    Message::add_channel_to_my_list(std::string channel) {
-    std::cout << "added : " + channel << "for : " << this->client.get_nick_name() << std::endl;
     this->joined_channels.push_back(channel);
 }
 

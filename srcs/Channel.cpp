@@ -2,7 +2,7 @@
 
 Channel:: Channel()
 {
-    set_limit(2);
+    set_limit(10);
 }
 
 Channel:: ~Channel()
@@ -51,13 +51,13 @@ void    Channel::add_user_to_list(int user) {
     this->users_list.push_back(user);
 }
 
-void    Channel::print_users_list() {
-    std::vector <int>::iterator it;
+// void    Channel::print_users_list() {
+//     std::vector <int>::iterator it;
 
-    for (it = this->users_list.begin(); it != this->users_list.end(); it++) {
-        std::cout <<"user : " << *it << std::endl;
-    }
-}
+//     for (it = this->users_list.begin(); it != this->users_list.end(); it++) {
+//         std::cout <<"user : " << *it << std::endl;
+//     }
+// }
 
 std::vector<int> Channel::get_users_list() {
     return (this->users_list);
@@ -87,14 +87,10 @@ void Channel::remove_user_from_channel_list(int user) {
     it = find(this->users_list.begin(), this->users_list.end(), user);
     if (it != this->users_list.end()) {
         this->users_list.erase(it);
-        std::cout << "user remouved from channel " + this->get_channel_name() << std::endl;
     }
-    this->print_users_list();
 }
 
 bool    Channel::is_admin(int socket) {
-    std::cout << "is admin recieved : " << socket << std::endl;
-    std::cout << "recieved :: " << socket << std::endl;
     if (find(this->admins.begin(), this->admins.end(), socket) != this->admins.end())
         return (true);
     return (false);
@@ -129,7 +125,6 @@ void    Channel::remove_user_to_invite_qeue(int user) {
     {
         if (this->invited_list[index] == user) {
             this->invited_list.erase(this->invited_list.begin() + index);
-            std::cout << "remouved ." << std::endl;
         }
         index++;
     }

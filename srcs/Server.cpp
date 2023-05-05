@@ -121,8 +121,6 @@ void Server:: accept_socket(void)
                         my_message.set_time();
                         if (result == 0) {
                             my_message.add_hostname(std::string(host));
-                        } else {
-                            std::cout << "Error getting client hostname: " << std::endl;
                         }
                         this->file_vectors[new_socket_fd] = my_message;
                     }
@@ -300,8 +298,6 @@ void Server:: close_socket(int socket)
     }
     std:: cout << "Client is DISCONNECTED" << std:: endl;
     close(socket);
-    std::cout << "######## : " + this->file_vectors[my_place].get_client().get_nick_name() << std::endl ;
-    std::cout << "######## : " <<  this->file_vectors[my_place].get_socket() << std::endl ;
     this->file_vectors.erase(my_place);
     it = file_vectors.find(socket);
     if (it != file_vectors.end())
@@ -332,9 +328,7 @@ int Server:: send_private_message(int sockfd)
 {
     int num = 0;
     std:: string message;
-    // std:: map<int, Message>::iterator it ;
 
-    std::cout << "dkhlate hna send_private message o hahowa l user dialna"  << this->file_vectors[sockfd].get_user_to_send() << std::endl;
     for (size_t i = 0; i != this->file_vectors.size(); i++)
     {
         if (this->file_vectors[i].get_my_user() == this->file_vectors[sockfd].get_user_to_send())
@@ -440,7 +434,6 @@ void    Server::send_message_to_channel(std::string channel_name,std::string mes
     list = this->channels[channel_name].get_users_list();
     if (message[0] == '#')
         message = message.substr(message.find(' '), message.find('\r'));
-    std::cout << "......." << message << std::endl;
     msg = ":" + client +  " PRIVMSG #" + channel_name + " :" + message + "\r\n";
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
     {
@@ -473,7 +466,6 @@ void    Server::send_join_message(std::string username, std::string channel_name
 
     list = this->channels[channel_name].get_users_list();
     msg = ":" + username + " JOIN #" + channel_name + "\r\n";
-    std::cout << msg ;
     for (it = this->file_vectors.begin(); it != this->file_vectors.end(); it++)
     {
         if (find(list.begin(), list.end(), it->second.get_socket()) != list.end()) {
@@ -538,10 +530,8 @@ void    Server::send_part_message_to_channel(std::string channel_name,std::strin
         if (find(list.begin(), list.end(), it->second.get_socket()) != list.end()){
 
            if (send(it->second.get_socket(),msg.c_str(),msg.size(),0) < 0)
-                std::cout << "Error:  micaje not sind" << std::endl;
+                std::cout << "Error:  message not send" << std::endl;
         }
-        else
-            std::cout << "user :" << it->second.get_client().get_nick_name() << " not in channel." << std::endl;
     }
 }
 

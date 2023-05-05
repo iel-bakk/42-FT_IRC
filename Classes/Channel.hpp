@@ -26,7 +26,7 @@ public:
     std::string                 get_channel_name();
     std::string                 get_channel_password();
     void                        add_user_to_list(int user);
-    void                        print_users_list();
+    // void                        print_users_list();
     std::vector<int>            get_users_list();
     void                        empty_channel();
     void                        remove_user_from_channel_list(int username);
