@@ -2,6 +2,7 @@
 
 Channel:: Channel()
 {
+    set_limit(2);
 }
 
 Channel:: ~Channel()
@@ -155,4 +156,14 @@ void    Channel::remove_admin(int socket) {
     it = find(this->admins.begin(), this->admins.end(), socket);
     if (it != this->admins.end())
         this->admins.erase(it);
+}
+
+void Channel::set_limit(size_t limit)
+{
+    this->limit = limit;
+}
+
+size_t Channel::get_limit()
+{
+    return (this->limit);
 }

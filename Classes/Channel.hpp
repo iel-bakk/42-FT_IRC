@@ -16,6 +16,8 @@ private:
     std::string topic;
     std::vector <int>   invited_list;
     bool  user_in_channel;
+    size_t  limit;
+
 
 public:
     Channel();
@@ -42,6 +44,7 @@ public:
     std::vector <std::string>   get_my_channels_list();
     int    add_admin_to_list(int socket);
     size_t                      get_limit();
+    void set_limit(size_t limit);
 };
 
 #endif

@@ -178,6 +178,8 @@ int Message:: check_my_vector(std:: string request, Server& server)
             }
             else {
                 if (this->channel.get_channel_password() == server.get_channel_password(this->channel.get_channel_name())) {
+                if (server.get_channel(this->channel.get_channel_name()).get_users_list().size() >= this->channel.get_limit())
+                    return (471);
                 if (server.user_exist_in_channel(this->get_socket(), this->channel.get_channel_name()))
                     return (462);
                     server.add_user_to_channel(this->socket, this->channel.get_channel_name());
