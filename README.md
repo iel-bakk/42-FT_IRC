@@ -20,8 +20,6 @@ This project is intended to teach students about network programming, socket pro
 
 Generally, the user (such as you) runs a program (called a “client”) to connect to a server on one of the IRC nets. The server relays information to and from other servers on the same net. Recommended clients:
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/9cade14a-a492-4e2c-83b9-56336441950b/Untitled.png)
-
 - [UNIX/Linux Clients](https://www.irchelp.org/clients/unix/)
     - [irssi](https://www.irchelp.org/irchelp/clients/unix/irssi/) - terminal-mode client
     - [xchat](https://www.irchelp.org/irchelp/clients/unix/xchat.html) - X11 (graphical) client
@@ -72,8 +70,6 @@ Servers form the backbone of IRC, providing a point to which clients may connect
 
 The most common network configuration for IRC servers is that of a spanning tree [see the figure below], where each server acts as a central node for the rest of the network it sees. Other topologies are being experimented with, but right now there are none widely used in production.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/957e22bb-1e88-4198-ac81-9efebac9cd44/Untitled.png)
-
 There have been several terms created over time to describe the roles of different servers on an IRC network. Some of the most common terms are as follows:
 
 - **Hub**: A ‘hub’ is a server that connects to multiple other servers. For instance, in the figure above, Server 2, Server 3, and Server 4 would be examples of hub servers.
@@ -97,8 +93,6 @@ According to the protocol specifications, an IRC network is a group of servers c
 
 - custom settings;
 - service stations.
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/138a0407-7b59-4305-a32f-830e648516b5/Untitled.png)
 
 ### Forwarding messages in the IRC network
 
