@@ -6,12 +6,6 @@
 
 IRC, an Application Layer protocol, is used by the World Wide Web (WWW). A protocol defines rules governing communication between entities. In the context of computer networking, it specifies how devices communicate over a network.
 
-## WWW 🌐
-
-"WWW" stands for World Wide Web, a system of interlinked hypertext documents accessed via the internet. It involves servers, computers, and devices allowing people to access and share information globally.
-
-This project teaches network programming, socket programming, and the IRC protocol implementation in C++. It involves handling multiple clients simultaneously using multiple threads.
-
 ## IRC Network 🌐
 
 **IRC nets** refer to collections of servers connected for Internet Relay Chat (IRC). Each IRC network has channels, rules, and user communities. Users connect to IRC networks using client software.
